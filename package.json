@@ -1,0 +1,1 @@
+{ "name": "d4u-private-barber", "private": true, "type": "module", "version": "0.1.0", "scripts": { "build:engine": "python3 build_engine.py", "test": "node test/run.mjs" } }

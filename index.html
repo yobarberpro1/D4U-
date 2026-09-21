@@ -1,0 +1,1392 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#050506"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black">
+<style>[hidden]{display:none!important}</style>
+<script src="/config.js"></script>
+</head><body>
+<title>D4U Private Barber</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400;500&family=Inter:wght@400;500;600&display=swap">
+<style>
+:root{
+  /* noirs : du plus profond au plus clair */
+  --k0:#050506; --k1:#0B0B0D; --k2:#111215; --k3:#18191D;
+  --line:#1E1F24; --line2:#2C2E35;
+  /* argent (rare) et diamant (important) */
+  --silver:#B4BAC3; --muted:#8D939C; --faint:#767B85;
+  --text:#E4E6EA; --diamond:#F6F8FA; --on-diamond:#050506;
+  --alert:#D49A92;
+  /* alias */
+  --ink:var(--k0); --panel:var(--k1); --panel2:var(--k2); --line-2:var(--line2); --bone:var(--diamond); --on-bone:var(--on-diamond);
+  --display:'Jost','Futura','Century Gothic','Helvetica Neue',Arial,sans-serif;
+  --body:'Inter','Helvetica Neue',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --hi:inset 0 1px 0 rgba(255,255,255,.035);
+  --ease:cubic-bezier(.3,.6,.2,1);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{background:var(--k0)}
+body{background:var(--k0);color:var(--text);font:15px/1.55 var(--body);margin:0;padding-inline:16px;padding-block:0;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+h1,h2,h3,p{margin:0}
+button,input,textarea,select{font:inherit;color:inherit}
+a{color:inherit}
+.wrap{max-width:1080px;margin:0 auto}
+.narrow{max-width:600px;margin:0 auto}
+:focus-visible{outline:1px solid var(--silver);outline-offset:3px}
+.disp{font-family:var(--display);text-transform:uppercase;letter-spacing:.05em;font-weight:300}
+.h1{font-size:clamp(28px,7.4vw,42px);line-height:1.08}
+.eyebrow{font-size:10.5px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)} .faint{color:var(--faint)}
+.tnum{font-variant-numeric:tabular-nums}
+.hair{height:1px;background:linear-gradient(90deg,transparent,var(--line2) 18%,var(--line2) 82%,transparent)}
+.glyph{color:var(--silver);font-family:var(--body)}
+
+/* signature : logo D4U */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:20px}
+.brand{display:flex;align-items:center;gap:13px;background:none;border:0;padding:0;cursor:pointer;color:var(--diamond)}
+.brand svg{width:22px;height:22px;flex:none;fill:none;stroke:var(--silver);stroke-width:1;stroke-linejoin:round}
+.brand .wm{display:grid;gap:5px;text-align:left}
+.brand .wm b{font:400 21px/1 var(--display);letter-spacing:.26em;margin-right:-.26em}
+.brand .wm small{font:500 7.5px/1 var(--body);letter-spacing:.5em;color:var(--muted);text-transform:uppercase;white-space:nowrap}
+
+/* boutons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 26px;border-radius:2px;border:1px solid var(--line2);background:transparent;font-weight:500;font-size:12px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:background .35s var(--ease),border-color .35s var(--ease),color .35s var(--ease)}
+.btn:hover{border-color:var(--silver);color:var(--diamond)}
+.btn-primary{background:#E9ECF0;color:var(--on-diamond);border-color:#E9ECF0}
+.btn-primary:hover{background:#fff;border-color:#fff;color:var(--on-diamond)}
+.btn-sm{min-height:34px;padding:0 14px;font-size:10.5px;letter-spacing:.14em}
+.btn-block{width:100%}
+.btn[disabled]{opacity:.35;cursor:not-allowed}
+.btn[disabled]:hover{border-color:var(--line2);color:inherit}
+.btn-link{background:none;border:0;padding:0;min-height:0;color:var(--muted);text-decoration:underline;text-decoration-color:var(--line2);text-underline-offset:4px;cursor:pointer;font-size:13.5px;transition:color .3s}
+.btn-link:hover{color:var(--diamond)}
+
+/* statuts : un losange, du vide au plein */
+.pill{display:inline-flex;align-items:center;gap:8px;font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;white-space:nowrap}
+.pill::before{content:"";width:6px;height:6px;transform:rotate(45deg);border:1px solid currentColor;flex:none}
+.p-actif{color:var(--faint)}
+.p-relancer{color:var(--silver)}
+.p-dormant{color:var(--diamond)}
+.p-dormant::before{background:currentColor}
+.p-exclure{color:var(--faint)}
+.p-exclure::before{border-style:dotted}
+.p-neutral{color:var(--muted)}
+
+/* landing */
+.hero{position:relative;display:flex;align-items:center;min-height:min(780px,calc(100svh - 100px));padding-block:56px 72px;isolation:isolate}
+.hero-in{max-width:760px;animation:rise 1.1s var(--ease) both}
+.hero h1{font-size:clamp(38px,10.4vw,104px);line-height:1.02;letter-spacing:.03em;font-weight:300;color:var(--diamond);text-wrap:balance}
+.hero .sub{font-size:clamp(16px,2.3vw,19px);color:var(--muted);max-width:26em;margin-top:32px;line-height:1.6}
+.hero .cta{margin-top:44px;display:flex;flex-direction:column;gap:18px;align-items:flex-start}
+.hero-fx{position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden;background:radial-gradient(60% 55% at 78% 42%,rgba(255,255,255,.035),transparent 70%)}
+.hero-fx svg{position:absolute;right:-30%;top:58%;width:min(720px,120vw);height:auto;transform:translateY(-50%);fill:none;stroke:#fff;stroke-opacity:.075;stroke-width:1;stroke-linejoin:round}
+.mock{background:var(--k1);border:1px solid var(--line);border-radius:4px;overflow:hidden;box-shadow:var(--hi)}
+.mock-h{padding:22px 22px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.mock-h b{display:block;font:200 64px/.95 var(--display);margin-top:12px;color:var(--diamond)}
+.mock-r{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 22px;border-bottom:1px solid var(--line);font-size:14px}
+.mock-r:last-child{border-bottom:0}
+.mock-r .n{font-weight:500;flex:1}
+.mock-r .tnum{white-space:nowrap}
+.tag-ex{font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--faint)}
+.section{padding-block:96px;border-top:1px solid var(--line)}
+.section h2{font-size:clamp(28px,5.2vw,46px);line-height:1.08;margin-top:16px;text-wrap:balance;font-weight:300}
+.steps{display:grid;grid-template-columns:1fr;gap:0;margin-top:48px}
+.step{position:relative;padding:28px 0 28px;border-top:1px solid var(--line2)}
+.step::before{content:"";position:absolute;left:0;top:-4px;width:7px;height:7px;transform:rotate(45deg);background:var(--k0);border:1px solid var(--silver)}
+.step .num{font:300 13px/1 var(--display);letter-spacing:.3em;color:var(--silver);padding-left:20px}
+.step h3{font:500 17px/1.35 var(--body);margin-top:16px;color:var(--diamond)}
+.step p{color:var(--muted);margin-top:8px;font-size:14.5px}
+.funnel{display:grid;gap:22px;margin-top:48px;max-width:560px}
+.f-item{display:grid;gap:12px}
+.f-top{display:flex;align-items:baseline;gap:16px}
+.f-top b{font:200 60px/1 var(--display);color:var(--diamond);min-width:2.4ch}
+.f-bar{height:1px;background:var(--line2);position:relative}
+.f-bar i{position:absolute;left:0;top:-1px;height:3px;background:var(--silver)}
+.f-arrow{display:none}
+.final{padding-block:120px 120px;border-top:1px solid var(--line)}
+.final h2{font-size:clamp(28px,5.6vw,52px);line-height:1.12;text-wrap:balance;max-width:16em;font-weight:300}
+.foot{padding-block:28px 44px;color:var(--faint);font-size:12px;letter-spacing:.06em;border-top:1px solid var(--line);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.sub2{font-size:clamp(16px,2.3vw,18px);color:var(--muted);max-width:38em;margin-top:24px;line-height:1.65}
+
+/* formulaires */
+.card{background:var(--k1);border:1px solid var(--line);border-radius:4px;padding:22px;box-shadow:var(--hi)}
+.field{display:grid;gap:8px;margin-bottom:22px}
+.field label,.lbl{font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--silver)}
+.hint{font-size:12.5px;color:var(--faint);line-height:1.5}
+.input,.ta{width:100%;background:var(--k0);border:1px solid var(--line2);border-radius:2px;padding:13px 14px;font-size:16px;outline:none;transition:border-color .3s}
+.input:focus,.ta:focus{border-color:var(--silver)}
+.ta{resize:vertical;min-height:110px;line-height:1.55}
+.err{color:var(--alert);font-size:13px}
+.input.bad{border-color:var(--alert)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:40px;padding:0 16px;border-radius:2px;border:1px solid var(--line2);background:transparent;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);transition:border-color .3s,color .3s,background .3s}
+.chip:hover{border-color:var(--silver);color:var(--diamond)}
+.chip[aria-pressed="true"]{background:#E9ECF0;color:var(--on-diamond);border-color:#E9ECF0}
+.prog{margin-block:8px 36px}
+.prog .bar{height:1px;background:var(--line2);position:relative}
+.prog .bar i{position:absolute;left:0;top:-1px;height:3px;background:var(--silver);transition:width .5s var(--ease)}
+.prog p{margin-top:16px}
+.drop{display:grid;place-items:center;text-align:center;gap:8px;padding:40px 16px;border:1px dashed var(--line2);border-radius:4px;cursor:pointer;background:var(--k1);transition:border-color .3s}
+.drop:hover,.drop.over{border-color:var(--silver)}
+.drop b{font-size:15px;font-weight:500;color:var(--diamond)}
+.code{font:12.5px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--k0);border:1px solid var(--line);border-radius:2px;padding:10px 12px;overflow-x:auto;white-space:pre;color:var(--muted)}
+.alert{border:1px solid var(--alert);background:rgba(212,154,146,.05);border-radius:2px;padding:14px 16px;margin-top:16px;display:grid;gap:8px;font-size:14px}
+.alert b{color:var(--alert);font-weight:500}
+.note{border:1px solid var(--line);background:var(--k2);border-radius:2px;padding:14px 16px;font-size:13.5px;color:var(--muted);line-height:1.55}
+.note b{color:var(--text);font-weight:500}
+.note.auto-on{width:100%}
+.divider{display:flex;align-items:center;gap:14px;color:var(--faint);font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;margin-block:26px}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--line)}
+.switch{flex:none;width:44px;height:24px;border-radius:999px;border:1px solid var(--line2);background:var(--k0);position:relative;cursor:pointer;padding:0;transition:background .3s var(--ease),border-color .3s var(--ease)}
+.switch i{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--muted);transition:transform .3s var(--ease),background .3s}
+.switch[aria-checked="true"]{background:#E9ECF0;border-color:#E9ECF0}
+.switch[aria-checked="true"] i{transform:translateX(20px);background:var(--on-diamond)}
+.tog{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-block:16px;border-bottom:1px solid var(--line)}
+.card .tog:last-child{border-bottom:0;padding-bottom:0}
+.tog b{font-size:15px;font-weight:500;color:var(--diamond)}
+.tog p{margin-top:3px}
+.check{display:flex;gap:14px;align-items:flex-start;font-size:13.5px;color:var(--muted);cursor:pointer;line-height:1.5}
+.check input{flex:none;width:18px;height:18px;margin:2px 0 0;accent-color:var(--silver)}
+.found{display:grid;gap:0;margin:16px 0 8px}
+.found-r{display:flex;align-items:baseline;gap:16px;padding-block:10px;border-bottom:1px solid var(--line)}
+.found-r b{font:300 40px/1 var(--display);min-width:3.2ch;color:var(--diamond)}
+.found-r span{color:var(--muted)}
+.ready{margin-top:20px;font:300 22px/1 var(--display);text-transform:uppercase;letter-spacing:.16em;color:var(--diamond)}
+.ready b{font-weight:300}
+.ready::before{content:"◇";color:var(--silver);margin-right:12px;font-family:var(--body);letter-spacing:0}
+.map-row{display:flex;align-items:center;gap:10px;padding-block:12px;border-bottom:1px solid var(--line)}
+.map-row:last-child{border-bottom:0}
+.map-l{flex:1;min-width:0;display:grid;gap:1px}
+.map-l b{font-size:14px;font-weight:500;word-break:break-word}
+.map-l .hint{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.arrow{color:var(--faint)}
+.map-sel{width:150px;flex:none;padding:9px 10px;font-size:14px}
+.others{margin-top:10px;border-top:1px solid var(--line);padding-top:10px}
+.others summary{cursor:pointer;color:var(--muted);font-size:13.5px;padding-block:4px}
+.decide{display:grid;gap:16px;margin-top:14px}
+.decide div{display:grid;grid-template-columns:92px 1fr;gap:12px;font-size:14px}
+.decide b{font:400 12px/1.9 var(--display);letter-spacing:.2em;text-transform:uppercase;color:var(--silver)}
+.decide span{color:var(--text)}
+
+/* app */
+.app-top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:18px}
+.who{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);text-align:right;max-width:38%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;background:rgba(5,5,6,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px))}
+.nav button{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:0;color:var(--faint);font-size:10.5px;font-weight:500;letter-spacing:.04em;padding:8px 0 4px;cursor:pointer;transition:color .3s}
+.nav button:hover{color:var(--silver)}
+.nav button[aria-current="page"]{color:var(--diamond)}
+.nav button[aria-current="page"]::before{content:"";position:absolute;top:0;left:50%;width:4px;height:4px;margin-left:-2px;transform:rotate(45deg);background:var(--silver)}
+.nav svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.app-main{padding-bottom:110px;max-width:860px;margin:0 auto}
+.hero-app{padding-block:40px 8px}
+.lab{font-size:10.5px;font-weight:500;letter-spacing:.26em;text-transform:uppercase;color:var(--silver)}
+.bignum{font:200 clamp(120px,34vw,220px)/.82 var(--display);letter-spacing:-.02em;color:var(--diamond)}
+@supports (-webkit-background-clip:text) or (background-clip:text){
+.bignum{background:linear-gradient(180deg,#FFFFFF 12%,#B9BFC8 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;padding-bottom:.04em}
+}
+.bignum.sm{font-size:clamp(72px,20vw,124px)}
+.big-l{margin-top:22px}
+.strip{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:0;border:1px solid var(--line);border-radius:4px;background:var(--k1);box-shadow:var(--hi)}
+.strip div{padding:16px 4px 16px 14px;border-left:1px solid var(--line);min-width:0}
+.strip div:first-child{border-left:0}
+.strip small{display:flex;align-items:flex-start;gap:5px;font-size:9.5px;line-height:1.35;letter-spacing:.14em;font-weight:500;color:var(--muted);text-transform:uppercase;min-height:2.7em}
+.strip b{display:block;font:300 clamp(24px,6.6vw,34px)/1.1 var(--display);margin-top:6px;white-space:nowrap;color:var(--diamond)}
+.strip.quiet b{color:var(--silver)}
+.auto-row{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px 0;border-bottom:1px solid var(--line);border-top:1px solid var(--line);margin-top:28px}
+.auto-row p{margin-top:6px;font-size:13px;color:var(--faint);max-width:30em;line-height:1.5}
+.onoff{display:flex;align-items:center;gap:10px;font:300 30px/1 var(--display);letter-spacing:.1em;color:var(--diamond)}
+.onoff::before{content:"";width:8px;height:8px;transform:rotate(45deg);border:1px solid var(--silver);flex:none}
+.onoff.on::before{background:var(--diamond);border-color:var(--diamond)}
+.onoff.off{color:var(--faint)}
+.seg{display:flex;gap:8px;margin-block:44px 14px;overflow-x:auto}
+.seg .chip{white-space:nowrap;flex:none}
+.list{border:1px solid var(--line);border-radius:4px;background:var(--k1);overflow:hidden;box-shadow:var(--hi)}
+.thead{display:none}
+.row{display:grid;grid-template-columns:1fr auto;grid-template-areas:"name act" "info act";gap:4px 12px;padding:16px 18px;border-bottom:1px solid var(--line);align-items:center;cursor:pointer;transition:background .25s}
+.row:last-child{border-bottom:0}
+.row:hover{background:var(--k2)}
+.c-name{grid-area:name;font-weight:500;font-size:15.5px;color:var(--diamond)}
+.c-info{grid-area:info;display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;color:var(--muted);font-size:12.5px}
+.c-act{grid-area:act;display:flex;justify-content:flex-end}
+.c-visit::before{content:"Vu le "}
+
+.empty{padding:44px 20px;text-align:center;color:var(--muted)}
+.wait{font-size:12px;color:var(--faint);text-align:right;max-width:110px;line-height:1.35}
+.sect-t{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:12px}
+.sect-t h2{font:300 22px/1 var(--display);text-transform:uppercase;letter-spacing:.14em}
+.tpl{margin-bottom:16px}
+.tpl-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.tpl-h h3{font:300 20px/1 var(--display);text-transform:uppercase;letter-spacing:.14em}
+.delay{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted);flex-wrap:wrap}
+.delay input{width:64px;text-align:center;padding:8px}
+.bubble{background:var(--k2);border:1px solid var(--line);border-radius:2px 12px 12px 12px;padding:14px 16px;font-size:14.5px;white-space:pre-wrap;word-break:break-word;max-width:100%;margin-top:12px;color:var(--text)}
+.vars{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.var{font:12px ui-monospace,Menlo,Consolas,monospace;padding:5px 9px;border-radius:2px;border:1px solid var(--line2);background:transparent;color:var(--muted);cursor:pointer;transition:border-color .3s,color .3s}
+.var:hover{color:var(--diamond);border-color:var(--silver)}
+.rate{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px}
+.tile{padding:18px;border:1px solid var(--line);border-radius:4px;background:var(--k1);box-shadow:var(--hi)}
+.tile b{display:block;font:300 46px/1 var(--display);color:var(--diamond);margin-bottom:8px}
+.tile small{color:var(--muted);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase}
+.hist{display:grid}
+.hist-r{display:flex;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid var(--line);font-size:14px;align-items:center}
+.hist-r:last-child{border-bottom:0}
+
+/* valeur économique */
+.pot{margin-top:28px;padding-top:22px;border-top:1px solid var(--line)}
+.pot-n{font:300 clamp(40px,11vw,60px)/1.05 var(--display);letter-spacing:.02em;color:var(--diamond);margin-top:12px}
+.pot-t{margin-top:4px;color:var(--muted)}
+.pot-line{margin-top:10px;font-size:14px;color:var(--muted)}
+.pot-line b{color:var(--text);font-weight:500}
+.roi{border:1px solid var(--line);border-radius:4px;background:var(--k1);padding:22px;margin-bottom:32px;box-shadow:var(--hi)}
+.roi-t{margin-top:12px;font:300 clamp(17px,4.6vw,22px)/1.35 var(--display);letter-spacing:.06em;text-transform:uppercase;color:var(--diamond)}
+.roi-t .glyph{margin-right:10px}
+/* moment diamant : sobre, rare, jamais un jeu */
+.moment{position:relative;overflow:hidden;border:1px solid var(--line2);border-radius:4px;background:var(--k1);padding:26px 24px;margin-bottom:36px;box-shadow:var(--hi);animation:rise .9s var(--ease) both}
+.moment svg{position:absolute;right:-14px;top:50%;width:170px;height:auto;transform:translateY(-50%);fill:none;stroke:#fff;stroke-opacity:.09;stroke-width:1;stroke-linejoin:round;pointer-events:none}
+.moment .mo-t{position:relative;font:300 clamp(20px,5.4vw,28px)/1.25 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--diamond)}
+.moment .mo-t .glyph{margin-right:12px}
+.moment .mo-s{position:relative;margin-top:8px;font:300 clamp(14px,3.6vw,17px)/1.3 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--silver)}
+.moment .hint{position:relative;margin-top:12px}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* feuille */
+.overlay{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.78);display:flex;align-items:flex-end;justify-content:center}
+.sheet{width:100%;max-width:580px;max-height:92%;overflow:auto;background:var(--k1);border:1px solid var(--line2);border-radius:8px 8px 0 0;padding:24px 20px calc(24px + env(safe-area-inset-bottom,0px))}
+.sheet-h{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:20px}
+.sheet-h h2{font:300 28px/1.1 var(--display);text-transform:uppercase;letter-spacing:.08em}
+.x{background:transparent;border:1px solid var(--line2);width:34px;height:34px;border-radius:2px;cursor:pointer;color:var(--muted);font-size:18px;line-height:1;flex:none;transition:border-color .3s,color .3s}
+.x:hover{border-color:var(--silver);color:var(--diamond)}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.acts .full{grid-column:1/-1}
+.q-row{padding:16px 0;border-bottom:1px solid var(--line);display:grid;gap:10px}
+.q-row:last-child{border-bottom:0}
+.q-row p{font-size:13.5px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.q-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.q-btns{display:flex;gap:8px}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:60;background:#E9ECF0;color:var(--on-diamond);padding:12px 20px;border-radius:2px;font-size:12.5px;font-weight:500;letter-spacing:.04em;max-width:calc(100% - 32px);text-align:center}
+.toast.hide{display:none}
+
+@media (min-width:640px){.steps{grid-template-columns:repeat(2,1fr);column-gap:32px}}
+@media (min-width:860px){
+  .hero .cta{flex-direction:row;align-items:center;gap:28px}
+  .nav{position:static;background:none;border:0;backdrop-filter:none;padding:0;gap:4px}
+  .nav button{flex-direction:row;padding:8px 14px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;gap:9px}
+  .nav button[aria-current="page"]{background:var(--k2)}
+  .nav button[aria-current="page"]::before{display:none}
+  .app-main{padding-bottom:70px}
+  .toast{bottom:32px}
+  .tiles{grid-template-columns:repeat(4,1fr)}
+  .overlay{align-items:center}
+  .sheet{border-radius:6px}
+  .thead,.row{grid-template-columns:1.2fr 1fr .8fr 1fr 150px}
+  .thead{display:grid;padding:12px 18px;border-bottom:1px solid var(--line);font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  .row{grid-template-areas:none;padding:14px 18px}
+  .c-name,.c-info,.c-act{grid-area:auto}
+  .c-info{display:contents}
+  .c-visit::before{content:none}
+  .c-visit::before{content:none}
+  .row .c-visit,.row .c-days,.row .c-status{font-size:13.5px;color:var(--muted)}
+  .row .c-status{color:inherit}
+  .map-sel{width:220px}
+  .wait{max-width:none;white-space:nowrap}
+  .strip small{min-height:0;align-items:center}
+}
+@media (min-width:960px){.steps{grid-template-columns:repeat(5,1fr);column-gap:28px}.step h3{font-size:16px}}
+@media (min-width:480px){.strip small{min-height:0}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<div id="root"></div>
+<div id="sheet"></div>
+<div id="toast" class="toast hide" role="status" aria-live="polite"></div>
+<script>
+(function(){
+'use strict';
+var KEY='relanceur.v1', DAY=86400000, NB=' ', CLOCK=null;
+var REMOTE=false,PREPARE_ONLY=false,SERVERMODE=false; /* REMOTE : app connectée au serveur ; SERVERMODE : ce code tourne sur le serveur */
+function now(){return CLOCK?new Date(CLOCK):new Date();}
+function setToday(s){if(!s){CLOCK=null;return;}var p=s.split('-').map(Number);CLOCK=new Date(p[0],p[1]-1,p[2],12).getTime();}
+var FOOTER='Réponds STOP pour ne plus recevoir de messages.';
+var DEFAULT_TPL=[
+"Salut {{prenom}} 👋🏾\nÇa fait un moment qu’on ne t’a pas vu.\nSi tu veux reprendre ton prochain cut, tu peux réserver ici :\n{{lien_reservation}}",
+"Hey {{prenom}}, c’est {{barbier}}. Je repasse vite fait : il me reste quelques créneaux cette semaine si tu veux te refaire une beauté.\nRéserve ici : {{lien_reservation}}",
+"{{prenom}}, dernier message de ma part pour ne pas t’embêter 🙏🏾 Ta place est toujours là quand tu veux :\n{{lien_reservation}}\nPrends soin de toi."
+];
+var FREQS=[7,14,21,30,45,60];
+var FIELDS=[
+  {k:'prenom',l:'Prénom'},{k:'nom',l:'Nom'},{k:'fullname',l:'Nom complet'},
+  {k:'tel',l:'Téléphone'},{k:'email',l:'Email'},{k:'lastv',l:'Dernière visite'},
+  {k:'visits',l:'Nombre de visites'},{k:'firstv',l:'Première visite'},{k:'nextv',l:'Prochain rendez-vous'},
+  {k:'noshow',l:'Rendez-vous manqués'},{k:'optout',l:'Désabonné'},{k:'optin',l:'Accepte les messages'}
+];
+var FIELD_LABEL={};FIELDS.forEach(function(f){FIELD_LABEL[f.k]=f.l;});
+
+/* ---------- state ---------- */
+function blank(){return{
+  onboarded:false,sample:false,
+  profile:{nom:'',lien:'',contact:'',freq:21,adapt:true,prix:35},
+  clients:[],messages:[],templates:DEFAULT_TPL.slice(),
+  delays:{r1:3,r2:4,r3:7},
+  auto:{on:false,consent:false,noshow:true,retard:true,dormant:true,sms:true,email:true},
+  lastImport:null
+};}
+function nearestFreq(f){var b=FREQS[0];FREQS.forEach(function(x){if(Math.abs(x-f)<Math.abs(b-f))b=x;});return b;}
+function fixClient(c){
+  c.tel=c.tel||'';c.email=c.email||'';c.nom=c.nom||'';
+  c.dates=c.dates&&c.dates.length?c.dates:(c.lastVisit?[c.lastVisit]:[]);
+  c.visits=c.visits||c.dates.length;c.first=c.first||c.dates[0]||'';c.next=c.next||'';
+  c.noshow=!!c.noshow;c.optout=!!c.optout;c.stage=c.stage||0;
+  return c;
+}
+function normState(s){
+  var b=blank(),p=Object.assign(b.profile,s.profile||{});if(FREQS.indexOf(p.freq)<0)p.freq=nearestFreq(p.freq);
+  return{onboarded:!!s.onboarded,sample:!!s.sample,profile:p,clients:(s.clients||[]).map(fixClient),messages:s.messages||[],
+    templates:(s.templates&&s.templates.length===3)?s.templates:b.templates,delays:Object.assign(b.delays,s.delays||{}),
+    auto:Object.assign(b.auto,s.auto||{}),lastImport:s.lastImport||null};
+}
+function load(){
+  try{var raw=localStorage.getItem(KEY);if(raw)return normState(JSON.parse(raw));}catch(e){}
+  return blank();
+}
+var S=(typeof window!=='undefined'&&window.D4U_CONFIG&&window.D4U_CONFIG.supabaseUrl)?blank():load();
+function save(){
+  try{
+    if(!BACKEND)localStorage.setItem(KEY,JSON.stringify(S));
+    else if(sess){localStorage.setItem(mirrorKey(),JSON.stringify({dirty:true,at:Date.now(),state:S}));schedulePush();}
+  }catch(e){}
+}
+var ui={view:'landing',tab:'clients',step:1,filter:'recover',shown:40,sheet:null,draftMsg:'',errors:{},importErr:null,imp:null,impRes:null,fromSettings:false,confirmReset:false,busy:false};
+
+/* ---------- connexion Supabase (facultative : sans configuration, l'app reste 100 % locale) ---------- */
+var CFG=(typeof window!=='undefined'&&window.D4U_CONFIG&&window.D4U_CONFIG.supabaseUrl&&window.D4U_CONFIG.supabaseAnonKey)?window.D4U_CONFIG:null;
+var BACKEND=!!CFG,SESSK='d4u.session',sess=null,pushT=null;
+var sync={state:BACKEND?'idle':'off',providers:{sms:false,email:false},hours:''};
+try{if(BACKEND)sess=JSON.parse(localStorage.getItem(SESSK)||'null');}catch(e){sess=null;}
+function realSend(){return BACKEND&&!!(sync.providers.sms||sync.providers.email);}
+function SIM(){return realSend()?'':' (simulation)';}
+function mirrorKey(){return KEY+'.'+(sess&&sess.user&&sess.user.id);}
+function storeSess(x){sess=x;try{if(x)localStorage.setItem(SESSK,JSON.stringify(x));else localStorage.removeItem(SESSK);}catch(e){}}
+function sessFrom(j){return{access_token:j.access_token,refresh_token:j.refresh_token,expires_at:Date.now()+(j.expires_in||3600)*1000-60000,user:{id:j.user.id,email:j.user.email}};}
+function authMsg(j){
+  var m=(j&&(j.msg||j.error_description||j.message||j.error))||'Connexion impossible.';
+  if(/invalid login/i.test(m))return 'Email ou mot de passe incorrect.';
+  if(/already registered|already been registered/i.test(m))return 'Un compte existe déjà avec cet email.';
+  if(/password/i.test(m)&&/short|least|characters|weak/i.test(m))return 'Mot de passe trop court (8 caractères minimum).';
+  if(/not confirmed/i.test(m))return 'Confirme d’abord ton email (lien reçu par email), puis reconnecte-toi.';
+  if(/valid email|invalid.*email/i.test(m))return 'Cet email ne semble pas valide.';
+  return m;
+}
+function authCall(kind,email,pw){
+  var path=kind==='signup'?'/auth/v1/signup':'/auth/v1/token?grant_type=password';
+  return fetch(CFG.supabaseUrl+path,{method:'POST',headers:{apikey:CFG.supabaseAnonKey,'Content-Type':'application/json'},body:JSON.stringify({email:email,password:pw})})
+    .then(function(r){return r.json().catch(function(){return {};}).then(function(j){if(!r.ok)throw new Error(authMsg(j));return j;});},function(){throw new Error('Pas de connexion au serveur. Réessaie.');});
+}
+function refreshSess(){
+  if(!sess||!sess.refresh_token)return Promise.reject(new Error('Session expirée'));
+  return fetch(CFG.supabaseUrl+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{apikey:CFG.supabaseAnonKey,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:sess.refresh_token})})
+    .then(function(r){return r.json().then(function(j){if(!r.ok||!j.access_token){storeSess(null);throw new Error('Session expirée');}storeSess(sessFrom(j));});});
+}
+function fresh(){return(sess&&sess.expires_at<Date.now())?refreshSess():Promise.resolve();}
+function sbFetch(path,o,retried){
+  o=o||{};
+  return fresh().then(function(){
+    var h=Object.assign({apikey:CFG.supabaseAnonKey,'Content-Type':'application/json',Authorization:'Bearer '+((sess&&sess.access_token)||CFG.supabaseAnonKey)},o.headers||{});
+    return fetch(CFG.supabaseUrl+path,{method:o.method||'GET',headers:h,body:o.body==null?undefined:JSON.stringify(o.body)});
+  }).then(function(r){
+    if(r.status===401&&sess&&!retried)return refreshSess().then(function(){return sbFetch(path,o,true);});
+    return r.text().then(function(t){var j=null;try{j=t?JSON.parse(t):null;}catch(e){}
+      if(!r.ok){var er=new Error((j&&(j.message||j.msg||j.error))||('HTTP '+r.status));er.status=r.status;throw er;}return j;});
+  });
+}
+function schedulePush(){sync.state='saving';clearTimeout(pushT);pushT=setTimeout(pushNow,600);}
+function pushNow(){
+  if(!BACKEND||!sess)return Promise.resolve();
+  clearTimeout(pushT);var at=Date.now();
+  return sbFetch('/rest/v1/barbers?user_id=eq.'+sess.user.id,{method:'PATCH',body:{state:S,updated_at:new Date(at).toISOString()},headers:{Prefer:'return=minimal'}})
+    .then(function(){sync.state='ok';try{localStorage.setItem(mirrorKey(),JSON.stringify({dirty:false,at:at,state:S}));}catch(e){}},
+      function(){sync.state='error';});
+}
+function readMirror(){try{return JSON.parse(localStorage.getItem(mirrorKey())||'null');}catch(e){return null;}}
+function bootRemote(){
+  var uid=sess.user.id;sync.state='saving';
+  return sbFetch('/rest/v1/barbers?user_id=eq.'+uid+'&select=state,server_state,updated_at').then(function(rows){
+    var row=rows&&rows[0],mir=readMirror(),src=null,pushAfter=false;
+    if(mir&&mir.dirty&&mir.state&&(!row||new Date(row.updated_at).getTime()<=mir.at)){src=mir.state;pushAfter=true;}
+    else if(row&&row.state&&Object.keys(row.state).length)src=row.state;
+    S=src?normState(src):blank();REMOTE=true;
+    if(row)applyServer(row.server_state);
+    var first=row?Promise.resolve():sbFetch('/rest/v1/barbers',{method:'POST',body:{user_id:uid,state:S},headers:{Prefer:'return=minimal'}});
+    return first.then(function(){sync.state='ok';return(pushAfter||(row&&row.server_state))?pushNow():null;});
+  });
+}
+function pollServer(){
+  if(!BACKEND||!sess)return Promise.resolve(0);
+  return sbFetch('/rest/v1/barbers?user_id=eq.'+sess.user.id+'&select=server_state').then(function(rows){
+    var n=applyServer(rows&&rows[0]&&rows[0].server_state);if(n)save();return n;},function(){return 0;});
+}
+function fetchStatus(){
+  if(!BACKEND)return Promise.resolve();
+  return fetch('/api/status').then(function(r){return r.ok?r.json():null;}).then(function(j){if(j){sync.providers={sms:!!j.sms,email:!!j.email};sync.hours=j.hours||'';}},function(){});
+}
+function runNow(){
+  if(!BACKEND||!sess)return Promise.resolve(null);
+  return fresh().then(function(){return fetch('/api/run-now',{method:'POST',headers:{Authorization:'Bearer '+sess.access_token}});})
+    .then(function(r){return r.ok?r.json():null;}).catch(function(){return null;});
+}
+function signOut(){
+  try{localStorage.removeItem(mirrorKey());}catch(e){}
+  storeSess(null);S=blank();REMOTE=false;sync.state='idle';
+}
+
+/* ---------- helpers ---------- */
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function pad(n){return n<10?'0'+n:''+n;}
+function dstr(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function dnum(s){var p=s.split('-').map(Number);return Math.round(Date.UTC(p[0],p[1]-1,p[2])/DAY);}
+function daysSince(s,n){return dnum(dstr(n||now()))-dnum(s);}
+function addDays(s,n){var d=new Date(dnum(s)*DAY+n*DAY);return d.getUTCFullYear()+'-'+pad(d.getUTCMonth()+1)+'-'+pad(d.getUTCDate());}
+function uid(){return Math.random().toString(36).slice(2,10);}
+function fr(n){return Number(n).toLocaleString('fr-CA');}
+function money(n){return fr(Math.round(n))+NB+'$';}
+function pct(x){return (Math.round(x*10)/10).toString().replace('.',',')+NB+'%';}
+function fmtDate(s){var p=s.split('-').map(Number);var d=new Date(p[0],p[1]-1,p[2]);var o={day:'numeric',month:'short'};if(p[0]!==now().getFullYear())o.year='numeric';return d.toLocaleDateString('fr-CA',o).replace('.','');}
+function digits(s){return String(s||'').replace(/\D/g,'');}
+function cap(s){s=String(s||'').trim();if(!s)return s;return s===s.toLowerCase()||s===s.toUpperCase()?s.toLowerCase().replace(/(^|[\s\-'’])([a-zà-ÿ])/g,function(m,a,b){return a+b.toUpperCase();}):s;}
+var EMAIL_RE=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/* ---------- lecture des fichiers (CSV + Excel) ---------- */
+function parseCSV(text){
+  text=String(text||'').replace(/^﻿/,'');
+  var first=(text.split(/\r?\n/).filter(function(l){return l.trim();})[0])||'';
+  var best=',',bc=-1;[',',';','\t'].forEach(function(d){var c=first.split(d).length-1;if(c>bc){bc=c;best=d;}});
+  var rows=[],row=[],f='',q=false;
+  for(var i=0;i<text.length;i++){
+    var ch=text[i];
+    if(q){ if(ch==='"'){ if(text[i+1]==='"'){f+='"';i++;} else q=false; } else f+=ch; }
+    else if(ch==='"'){q=true;}
+    else if(ch===best){row.push(f);f='';}
+    else if(ch==='\n'||ch==='\r'){ if(ch==='\r'&&text[i+1]==='\n')i++; row.push(f);f='';rows.push(row);row=[]; }
+    else f+=ch;
+  }
+  row.push(f);rows.push(row);
+  return rows.filter(function(r){return r.some(function(c){return String(c).trim()!=='';});});
+}
+function loadXLSX(){
+  if(window.XLSX)return Promise.resolve(window.XLSX);
+  return new Promise(function(res,rej){
+    var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload=function(){window.XLSX?res(window.XLSX):rej(new Error('xlsx'));};s.onerror=function(){rej(new Error('xlsx'));};
+    document.head.appendChild(s);
+  });
+}
+function cellStr(v){
+  if(v instanceof Date){var d=new Date(v.getTime()+12*3600*1000);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+  if(v==null)return'';
+  return String(v).trim();
+}
+function parseXLSX(X,buf){
+  var wb=X.read(buf,{type:'array',cellDates:true});
+  for(var i=0;i<wb.SheetNames.length;i++){
+    var rows=X.utils.sheet_to_json(wb.Sheets[wb.SheetNames[i]],{header:1,raw:true,defval:''}).map(function(r){return r.map(cellStr);})
+      .filter(function(r){return r.some(function(c){return c!=='';});});
+    if(rows.length>=2)return rows;
+  }
+  return [];
+}
+function decodeText(buf){try{return new TextDecoder('utf-8',{fatal:true}).decode(buf);}catch(e){try{return new TextDecoder('windows-1252').decode(buf);}catch(e2){return '';}}}
+function readTable(file){
+  return new Promise(function(res,rej){
+    var fr_=new FileReader();
+    fr_.onload=function(){
+      var buf=fr_.result,name=(file.name||'').toLowerCase();
+      if(/\.(xlsx|xlsm|xls|ods)$/.test(name)||(new Uint8Array(buf,0,2)[0]===0x50&&new Uint8Array(buf,0,2)[1]===0x4B)){
+        loadXLSX().then(function(X){res(parseXLSX(X,buf));},function(){rej({title:'Excel indisponible',msg:'Impossible de lire ce fichier Excel pour l’instant. Ouvre-le et enregistre-le au format CSV, puis réessaie.'});});
+      } else res(parseCSV(decodeText(buf)));
+    };
+    fr_.onerror=function(){rej({title:'Lecture impossible',msg:'Le fichier n’a pas pu être lu. Réessaie ou colle son contenu dans la zone de texte.'});};
+    fr_.readAsArrayBuffer(file);
+  });
+}
+
+/* ---------- reconnaissance des colonnes ---------- */
+function norm(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'');}
+var ALIASES={
+  prenom:['prenom','firstname','first','givenname','clientfirstname','prenomduclient','forename','prenoms'],
+  nom:['nom','lastname','last','surname','familyname','nomdefamille','clientlastname','nomclient'],
+  fullname:['nomcomplet','fullname','name','client','clientname','nomduclient','nomprenom','prenomnom','customer','customername','customerName'.toLowerCase()],
+  tel:['telephone','tel','phone','mobile','cell','cellulaire','portable','numero','numerodetelephone','whatsapp','phonenumber','telephonemobile','mobilephone','mobilenumber','cellphone','telportable','gsm','numeromobile','telmobile'],
+  email:['email','courriel','mail','emailaddress','adresseemail','adressecourriel','adressemail','clientemail','emailclient','adresseelectronique'],
+  lastv:['dernierevisite','derniervisite','lastvisit','dernierrdv','derniererdv','dernierrendezvous','lastappointment','dernierpassage','lastseen','datedernierevisite','datederniervisite','derniere','visite','date','lastvisitdate','dernierevisitedate','lastbooking','derniereseance','appointmentdate','datedurdv','datedurendezvous','rdv','lastappointmentdate','datedeladerniererdv','lastsale','derniererendezvous','datedernierrdv','lastactivity'],
+  visits:['nombredevisites','totalvisits','visits','visitcount','nbvisites','nombrederdv','appointments','totalappointments','transactioncount','nbrdv','nombrerdv','numberofvisits','numvisits','bookings','totalbookings','nbdevisites','nombrevisites','visites'],
+  firstv:['premierevisite','firstvisit','firstappointment','premierrdv','datepremierevisite','clientsince','firstseen','firstbooking','premierrendezvous','datepremierrdv'],
+  nextv:['prochainrdv','prochainrendezvous','nextappointment','nextbooking','upcomingappointment','prochainevisite','nextvisit','upcoming','datedeprochainrdv','prochainrdvdate','nextappointmentdate'],
+  noshow:['noshow','noshows','noshowcount','rdvmanques','rendezvousmanques','absences','missedappointments','nombredenoshow','manques','missed','nombrenoshow'],
+  optout:['unsubscribed','desabonne','optout','optedout','donotcontact','nepascontacter','donotemail','donotsms','marketingoptout','emailunsubscribed','smsunsubscribed','desinscrit','ne pas contacter'.replace(/ /g,'')],
+  optin:['acceptsmarketing','marketingconsent','consentement','consentementmarketing','optin','marketingoptin','emailsubscription','emailsubscriptionstatus','subscriptionstatus','emailmarketing','smsmarketing','marketingpreferences','acceptemarketing','accepteslesmessages','receivemarketing','newsletter','emailmarketingstatus','smsconsent','emailconsent']
+};
+function headerMap(headers){
+  var map={},used={};
+  headers.forEach(function(h,i){var n=norm(h);if(!n)return;
+    for(var j=0;j<FIELDS.length;j++){var k=FIELDS[j].k;if(map[k]==null&&ALIASES[k].indexOf(n)>-1){map[k]=i;used[i]=1;return;}}});
+  headers.forEach(function(h,i){var n=norm(h);if(!n||used[i])return;
+    for(var j=0;j<FIELDS.length;j++){var k=FIELDS[j].k;if(map[k]!=null)continue;
+      for(var a=0;a<ALIASES[k].length;a++){var al=ALIASES[k][a];if(al.length>=9&&n.indexOf(al)>-1){map[k]=i;used[i]=1;return;}}}});
+  return{map:map,used:used};
+}
+function headerScore(row){var s=0;row.forEach(function(c){var n=norm(c);if(!n)return;for(var k in ALIASES){if(ALIASES[k].indexOf(n)>-1){s++;return;}}});return s;}
+function trimToHeader(rows){var best=0,bs=-1;for(var i=0;i<Math.min(rows.length,10);i++){var s=headerScore(rows[i]);if(s>bs){bs=s;best=i;}}if(bs<=0)best=0;return rows.slice(best);}
+function inferByContent(headers,data,map,used){
+  var src={},cands=[];
+  headers.forEach(function(h,i){
+    if(used[i])return;
+    var vals=[];for(var r=0;r<data.length&&vals.length<200;r++){var v=String(data[r][i]==null?'':data[r][i]).trim();if(v)vals.push(v);}
+    if(vals.length<3)return;
+    var em=0,ph=0,dt=0,mx='';
+    vals.forEach(function(v){
+      if(EMAIL_RE.test(v))em++;
+      else{var d=parseDate(v);if(d){dt++;if(d>mx)mx=d;}else if(/^\+?[\d\s().\-]{9,}$/.test(v)&&digits(v).length>=9)ph++;}
+    });
+    var n=vals.length;
+    if(map.email==null&&em/n>=.6){map.email=i;used[i]=1;src.email='content';}
+    else if(map.tel==null&&ph/n>=.6){map.tel=i;used[i]=1;src.tel='content';}
+    else if(dt/n>=.6)cands.push({i:i,max:mx});
+  });
+  if(map.lastv==null&&cands.length){cands.sort(function(a,b){return a.max<b.max?1:-1;});map.lastv=cands[0].i;used[cands[0].i]=1;src.lastv='content';}
+  return src;
+}
+function startImport(rows,name){
+  rows=trimToHeader(rows||[]);
+  if(rows.length<2)return{ok:false,error:{title:'Fichier vide',msg:'Le fichier ne contient pas de clients (il faut une ligne d’en-têtes puis une ligne par client).'}};
+  var headers=rows[0].map(function(h){return String(h==null?'':h).trim();}),data=rows.slice(1);
+  var hm=headerMap(headers),src={};
+  Object.keys(hm.map).forEach(function(k){src[k]='header';});
+  var cs=inferByContent(headers,data,hm.map,hm.used);Object.keys(cs).forEach(function(k){src[k]=cs[k];});
+  return{ok:true,imp:{name:name||'',headers:headers,rows:data,map:hm.map,src:src}};
+}
+function requiredMissing(map){
+  var m=[];
+  if(map.prenom==null&&map.fullname==null&&map.nom==null)m.push('prénom');
+  if(map.lastv==null)m.push('dernière visite');
+  if(map.tel==null&&map.email==null)m.push('téléphone ou email');
+  return m;
+}
+
+/* ---------- valeurs ---------- */
+function parseDate(v){
+  v=String(v||'').trim();if(!v)return null;
+  var m,y,mo,d;
+  if((m=v.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})/))){y=+m[1];mo=+m[2];d=+m[3];}
+  else if((m=v.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4}|\d{2})(?!\d)/))){
+    var a=+m[1],b=+m[2];y=+m[3];if(y<100)y+=2000;
+    if(a>12){d=a;mo=b;} else if(b>12){mo=a;d=b;} else {d=a;mo=b;}
+  }
+  else if(/^\d{5}$/.test(v)){var dt=new Date(Date.UTC(1899,11,30)+(+v)*DAY);y=dt.getUTCFullYear();mo=dt.getUTCMonth()+1;d=dt.getUTCDate();}
+  else return null;
+  if(mo<1||mo>12||d<1||d>31||y<1990)return null;
+  var chk=new Date(y,mo-1,d);if(chk.getMonth()!==mo-1)return null;
+  return y+'-'+pad(mo)+'-'+pad(d);
+}
+function boolish(v){v=norm(v);if(['1','true','yes','y','oui','o','x','vrai'].indexOf(v)>-1)return true;if(['0','false','no','n','non','faux'].indexOf(v)>-1)return false;return null;}
+function isOptout(vOut,vIn,map){
+  var o=false;
+  if(map.optout!=null&&vOut){if(boolish(vOut)===true||/unsub|desabo|opt.?out|stop|ne pas/i.test(vOut))o=true;}
+  if(map.optin!=null&&vIn){if(boolish(vIn)===false||/unsub|desabo|declin|refus|never|non abonn|not subscribed|jamais/i.test(vIn))o=true;}
+  return o;
+}
+function uniqSorted(a){var s={};a.forEach(function(x){if(x)s[x]=1;});return Object.keys(s).sort();}
+
+/* ---------- construction des clients depuis un fichier ---------- */
+function buildClients(imp){
+  var map=imp.map,today=dstr(now()),out=[],byPhone={},byMail={},byName={},skipped={name:0,dupes:0};
+  function cell(row,k){var i=map[k];return i==null?'':String(row[i]==null?'':row[i]).trim();}
+  imp.rows.forEach(function(row){
+    var prenom=cell(row,'prenom'),nom=cell(row,'nom');
+    if(!prenom){var full=cell(row,'fullname')||(map.prenom==null?cell(row,'nom'):'');
+      if(full){var parts=full.split(/\s+/);prenom=parts.shift();nom=parts.join(' ');}}
+    prenom=cap(prenom);nom=cap(nom);
+    if(!prenom){skipped.name++;return;}
+    var tel=cell(row,'tel'),email=cell(row,'email').toLowerCase();
+    if(digits(tel).length<10)tel='';
+    if(!EMAIL_RE.test(email))email='';
+    var pk=tel?digits(tel).slice(-10):'',nk=norm(prenom+nom);
+    var lv=parseDate(cell(row,'lastv')),fv=parseDate(cell(row,'firstv')),nv=parseDate(cell(row,'nextv'));
+    var dates=[],next='';
+    if(lv){if(lv>today)next=lv;else dates.push(lv);}
+    if(fv&&fv<=today)dates.push(fv);
+    if(nv){if(nv>=today){if(!next||nv<next)next=nv;}else dates.push(nv);}
+    var visits=parseInt(cell(row,'visits'),10)||0,ns=cell(row,'noshow');
+    var noshow=(parseInt(ns,10)>0)||boolish(ns)===true||/no.?show/i.test(ns);
+    var opt=isOptout(cell(row,'optout'),cell(row,'optin'),map);
+    var idx=(pk&&byPhone[pk]!=null)?byPhone[pk]:(email&&byMail[email]!=null)?byMail[email]:(!tel&&!email&&byName[nk]!=null)?byName[nk]:-1;
+    var c;
+    if(idx>=0){
+      skipped.dupes++;c=out[idx];
+      if(!c.nom&&nom)c.nom=nom;
+      if(!c.tel&&tel)c.tel=tel;if(!c.email&&email)c.email=email;
+      c.dates=c.dates.concat(dates);c.visits=Math.max(c.visits,visits);
+      if(next&&(!c.next||next<c.next))c.next=next;
+      c.noshow=c.noshow||noshow;c.optout=c.optout||opt;
+    } else {
+      c={id:uid(),key:'',prenom:prenom,nom:nom,tel:tel,email:email,dates:dates,visits:visits,next:next,noshow:noshow,optout:opt,stage:0,lastSentDay:null,firstSentDay:null,relanced:false,replied:false,recovered:false};
+      idx=out.length;out.push(c);
+    }
+    if(c.tel)byPhone[digits(c.tel).slice(-10)]=idx;
+    if(c.email)byMail[c.email]=idx;
+    if(!c.tel&&!c.email)byName[nk]=idx;
+  });
+  var found={clients:out.length,tel:0,email:0,last:0};
+  out.forEach(function(c){
+    c.dates=uniqSorted(c.dates);c.lastVisit=c.dates.length?c.dates[c.dates.length-1]:'';c.first=c.dates[0]||'';
+    c.visits=Math.max(c.visits,c.dates.length);
+    c.key=c.tel?digits(c.tel).slice(-10):(c.email||('n:'+norm(c.prenom+c.nom)));
+    if(c.tel)found.tel++;if(c.email)found.email++;if(c.lastVisit)found.last++;
+  });
+  return{clients:out,found:found,skipped:skipped,hasNoshow:map.noshow!=null};
+}
+
+/* ---------- fusion (import régulier, sans doublons) ---------- */
+function findExisting(list,n){
+  for(var i=0;i<list.length;i++){
+    var o=list[i];
+    if(n.tel&&o.tel&&digits(o.tel).slice(-10)===digits(n.tel).slice(-10))return o;
+    if(n.email&&o.email&&o.email===n.email)return o;
+    if(!n.tel&&!n.email&&!o.tel&&!o.email&&norm(o.prenom+o.nom)===norm(n.prenom+n.nom))return o;
+  }
+  return null;
+}
+function mergeClients(built){
+  if(S.sample){S.clients=[];S.messages=[];S.sample=false;}
+  var res={added:0,updated:0,unchanged:0,rebooked:0,dupes:built.skipped.dupes,ignored:built.skipped.name,total:0};
+  var today=dstr(now());
+  built.clients.forEach(function(n){
+    var o=findExisting(S.clients,n);
+    if(!o){S.clients.push(n);res.added++;return;}
+    var before=JSON.stringify([o.prenom,o.nom,o.tel,o.email,o.lastVisit,o.visits,o.next,o.noshow,o.optout]),oldLast=o.lastVisit||'';
+    if(n.prenom)o.prenom=n.prenom;if(n.nom)o.nom=n.nom;
+    if(n.tel)o.tel=n.tel;if(n.email)o.email=n.email;
+    o.dates=uniqSorted((o.dates||[]).concat(n.dates));
+    o.lastVisit=o.dates.length?o.dates[o.dates.length-1]:'';o.first=o.dates[0]||'';
+    o.visits=Math.max(o.visits||0,n.visits||0,o.dates.length);
+    o.next=n.next||((o.next&&o.next>=today)?o.next:'');
+    if(built.hasNoshow)o.noshow=n.noshow;
+    o.key=o.tel?digits(o.tel).slice(-10):(o.email||o.key);
+    if(n.optout&&!o.optout){o.optout=true;o.optoutSource='import';o.optoutAt=today;o.stAt=Date.now();dropPending(o);}
+    if((o.stage||0)>0){
+      var newVisit=o.lastVisit>oldLast&&(!o.firstSentDay||o.lastVisit>=o.firstSentDay);
+      var booked=o.next&&o.next>=today;
+      if(newVisit||booked){recover(o,false);res.rebooked++;}
+    }
+    var after=JSON.stringify([o.prenom,o.nom,o.tel,o.email,o.lastVisit,o.visits,o.next,o.noshow,o.optout]);
+    if(before!==after)res.updated++;else res.unchanged++;
+  });
+  res.total=S.clients.length;
+  S.lastImport={at:Date.now(),added:res.added,updated:res.updated,rebooked:res.rebooked};
+  save();
+  return res;
+}
+function dropPending(c){S.messages=S.messages.filter(function(m){return !(m.clientId===c.id&&m.status==='a_envoyer');});}
+function recover(c,manual){
+  var t=dstr(now());
+  c.recovered=true;c.replied=true;c.relanced=true;c.recoveredAt=t;
+  if(manual){c.lastVisit=t;c.dates=uniqSorted((c.dates||[]).concat([t]));c.visits=Math.max(c.visits||0,c.dates.length);}
+  c.stage=0;c.lastSentDay=null;c.firstSentDay=null;c.stAt=Date.now();
+  dropPending(c);
+}
+function unsubscribe(c,src){c.optout=true;c.optoutSource=src||'manual';c.optoutAt=dstr(now());c.stAt=Date.now();dropPending(c);save();}
+
+/* ---------- données d'exemple ---------- */
+function sampleClients(){
+  var first=['Marcus','Kevin','Jordan','Malik','Dylan','Anthony','Samuel','Yanis','Bryan','Elie','Nathan','Jason','Ryan','Isaac','Tyrone','Amadou','Karim','Louis','Mathis','Adam','Noah','Cedric','Wesley','Junior','Steven','Jonathan','Rayan','Hugo','Emmanuel','Franck','Darius','Ibrahim','Théo','Olivier','Stéphane','Mike','Lucas','Rémi','Alex','Patrick','Josué','Mehdi','Sacha','Ken','Maxime','Fabrice','Idris','Enzo','Gaël','Walid','Chris','Tony','Aaron','Bilal','Kofi','Mario','Simon','Yohan','Rodrigue','Andy','Dany','Jérémy','Nicolas','Kaleb','Omar','Terry','Vincent','Sekou','Eric','Claude'];
+  var lastN=['T.','B.','L.','D.','M.','K.','R.','N.','S.','P.'];
+  var f=S.profile.freq||21,dorm=Math.max(f*3,60),seed=7;
+  function rnd(){seed=(seed*1664525+1013904223)%4294967296;return seed/4294967296;}
+  var fixed={Marcus:47,Kevin:82,Jordan:31},out=[],t=now();
+  first.forEach(function(n,i){
+    var days;
+    if(fixed[n]!=null)days=fixed[n];
+    else{var r=rnd();
+      if(r<.38)days=2+Math.floor(rnd()*f);
+      else if(r<.72)days=f+1+Math.floor(rnd()*(dorm-f));
+      else days=dorm+1+Math.floor(rnd()*140);}
+    var iv=fixed[n]!=null?21:Math.max(7,Math.min(60,f-3+Math.floor(rnd()*7))),nv=2+Math.floor(rnd()*6),dates=[];
+    for(var k=0;k<nv;k++)dates.push(dstr(new Date(t.getFullYear(),t.getMonth(),t.getDate()-days-k*iv)));
+    dates=dates.sort();
+    var nocontact=(i===66||i===67),tel=nocontact?'':'514-555-01'+pad(i%100);
+    out.push({id:uid(),key:tel?digits(tel).slice(-10):'n:'+norm(n+lastN[i%lastN.length]),prenom:n,nom:lastN[i%lastN.length],tel:tel,
+      email:(!nocontact&&i%3===0)?n.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')+'@exemple.com':'',
+      lastVisit:dates[dates.length-1],dates:dates,visits:nv,first:dates[0],next:'',noshow:false,optout:i===68,stage:0,lastSentDay:null,firstSentDay:null,relanced:false,replied:false,recovered:false});
+  });
+  return out;
+}
+
+/* ---------- rythme, segments, éligibilité ---------- */
+function avgInterval(c){
+  var d=c.dates||[],n=d.length;if(!n)return null;
+  var last=d[n-1],firstD=(c.first&&c.first<d[0])?c.first:d[0],v=Math.max(c.visits||0,n);
+  if(v<3)return null;
+  var span=dnum(last)-dnum(firstD);if(span<=0)return null;
+  return Math.max(7,Math.min(120,Math.round(span/(v-1))));
+}
+function clientFreq(c){var a=S.profile.adapt?avgInterval(c):null;return{fq:a||S.profile.freq,auto:!!a};}
+function dormantAfter(fq){return Math.max(fq*3,60);}
+function statusOf(days,fq){if(days<=fq)return'actif';if(days<=dormantAfter(fq))return'relancer';return'dormant';}
+function exclReason(c){if(c.optout)return'optout';if(!c.tel&&!c.email)return'contact';if(!c.lastVisit)return'date';return'';}
+function enrich(c){
+  var t=dstr(now()),f=clientFreq(c),e={c:c,fq:f.fq,autoFq:f.auto,days:c.lastVisit?daysSince(c.lastVisit):null};
+  e.due=c.lastVisit?addDays(c.lastVisit,f.fq):null;
+  e.late=e.days==null?null:e.days-f.fq;
+  e.booked=!!(c.next&&c.next>=t);
+  var why=exclReason(c);
+  if(why){e.status='exclure';e.why=why;}
+  else if(e.booked||e.days<=f.fq)e.status='actif';
+  else e.status=statusOf(e.days,f.fq);
+  return e;
+}
+function pending(c){return S.messages.filter(function(m){return m.clientId===c.id&&m.status==='a_envoyer';})[0];}
+function pickChannel(c,stage,auto){
+  var A=S.auto,sms=!!c.tel&&(!auto||A.sms),mail=!!c.email&&(!auto||A.email);
+  var pref=(stage%2===1)?['sms','email']:['email','sms'];
+  for(var i=0;i<2;i++){if(pref[i]==='sms'&&sms)return'sms';if(pref[i]==='email'&&mail)return'email';}
+  return null;
+}
+function eligibility(e,auto){
+  var c=e.c,A=S.auto,st=c.stage||0,type;
+  if(e.status==='exclure')return{ok:false,reason:'exclu',why:e.why};
+  if(pending(c))return{ok:false,reason:'queued'};
+  if(c.replied&&!c.recovered)return{ok:false,reason:'replied'};
+  if(st>=3)return{ok:false,reason:'done'};
+  if(e.booked)return{ok:false,reason:'booked'};
+  if(e.status==='actif'){
+    if(st===0&&A.noshow&&c.noshow&&!c.noshowDone)type='noshow';
+    else return{ok:false,reason:'actif'};
+  } else type=e.status==='relancer'?'retard':'dormant';
+  if(type!=='noshow'&&!A[type])return{ok:false,reason:'off',type:type};
+  var stage;
+  if(st===0){
+    if(type!=='noshow'&&e.late<S.delays.r1)return{ok:false,reason:'wait',stage:1,inDays:S.delays.r1-e.late};
+    stage=1;
+  } else {
+    var need=st===1?S.delays.r2:S.delays.r3,since=c.lastSentDay?daysSince(c.lastSentDay):999;
+    if(since<need)return{ok:false,reason:'wait',stage:st+1,inDays:need-since};
+    stage=st+1;
+  }
+  var ch=pickChannel(c,stage,!!auto);
+  if(auto&&!ch)return{ok:false,reason:'nochannel'};
+  return{ok:true,stage:stage,type:type,channel:ch};
+}
+function renderTpl(tpl,c,days){
+  var vals={prenom:c.prenom,nom:c.nom||'',lien_reservation:S.profile.lien,barbier:S.profile.nom,jours:days};
+  var out=String(tpl).replace(/\{\{\s*(\w+)\s*\}\}/g,function(m,k){return vals[k]==null?m:vals[k];});
+  if(S.profile.lien&&out.indexOf(S.profile.lien)<0)out+='\n'+S.profile.lien;
+  return out+'\n\n'+FOOTER;
+}
+function counts(){
+  var r={total:S.clients.length,actif:0,relancer:0,dormant:0,exclure:0,eligible:0,queued:0,tel:0,email:0,noshow:0,optout:0};
+  S.clients.forEach(function(c){var e=enrich(c);r[e.status]++;if(eligibility(e,false).ok)r.eligible++;
+    if(c.tel)r.tel++;if(c.email)r.email++;if(c.noshow)r.noshow++;if(c.optout)r.optout++;});
+  r.queued=S.messages.filter(function(m){return m.status==='a_envoyer';}).length;
+  return r;
+}
+function isSim(m){return !!m.simulated||m.channel==='simulation';}
+function stats(){
+  var cs=S.clients,sent=S.messages.filter(function(m){return m.status==='envoye';});
+  var rel=cs.filter(function(c){return c.relanced;}).length,rep=cs.filter(function(c){return c.replied;}).length,rec=cs.filter(function(c){return c.recovered;}).length;
+  return{analyzed:cs.length,relanced:rel,sent:sent.length,simulated:sent.filter(isSim).length,auto:sent.filter(function(m){return m.auto;}).length,
+    replied:rep,recovered:rec,rate:rel?rec/rel*100:0,revenue:rec*(+S.profile.prix||0)};
+}
+/* --- valeur économique : toujours distinguer potentiel estimé et résultat réel --- */
+var PLAN={prix:29,sms:200,extra:0.08,fondateur:19,mois:3};
+var RECOUP=0.15; /* hypothèse prudente : part des clients à récupérer qui reprennent rendez-vous */
+function potential(k){var rec=k.relancer+k.dormant,n=Math.round(rec*RECOUP);return{rec:rec,clients:n,ca:n*(+S.profile.prix||0)};}
+function clientById(id){return S.clients.filter(function(c){return c.id===id;})[0];}
+
+/* ---------- synchronisation serveur ----------
+   Le serveur (planificateur Netlify) est le seul à envoyer les relances réelles quand l'app est fermée.
+   Il écrit ses changements dans server_state ; l'app les fusionne ici. Règle unique, partagée :
+   les champs de séquence d'un client (SEQ) suivent une horloge logique stAt ; le plus récent gagne. */
+var SEQ=['stage','lastSentDay','firstSentDay','relanced','replied','recovered','recoveredAt','noshowDone','optout','optoutSource','optoutAt'];
+function seqOf(c){var p={stAt:c.stAt||0};SEQ.forEach(function(k){p[k]=c[k]===undefined?null:c[k];});return p;}
+function applyServer(ss){
+  var ch=0;if(!ss)return 0;
+  var byId={};S.clients.forEach(function(c){byId[c.id]=c;});
+  var P=ss.patches||{};
+  Object.keys(P).forEach(function(id){var c=byId[id],p=P[id];if(!c||!p||(p.stAt||0)<=(c.stAt||0))return;
+    SEQ.forEach(function(k){if(Object.prototype.hasOwnProperty.call(p,k))c[k]=p[k];});c.stAt=p.stAt;
+    if(c.optout)dropPending(c);ch++;});
+  var mine={};S.messages.forEach(function(m){mine[m.id]=m;});
+  (ss.messages||[]).forEach(function(m){var c=byId[m.clientId];if(!c)return;
+    if(m.status==='a_envoyer'&&(c.stAt||0)>m.createdAt)return;
+    var o=mine[m.id];
+    if(!o){S.messages.push(m);mine[m.id]=m;ch++;}
+    else if(o.status==='a_envoyer'&&m.status==='envoye'){Object.assign(o,m);ch++;}});
+  return ch;
+}
+function stillValid(m){var c=clientById(m.clientId);if(!c)return false;var e=enrich(c);
+  if(e.status==='exclure'||e.booked)return false;if(e.status==='actif'&&m.type!=='noshow')return false;return true;}
+
+/* ---------- envoi : architecture fournisseurs ----------
+   Pour brancher un vrai fournisseur, ajouter une entrée dans PROVIDERS
+   (ex. {id:'twilio',channels:['sms'],real:true,configured:true,send:function(m,c){...}})
+   puis l'associer au canal dans CHANNEL_PROVIDER. Tant qu'aucun fournisseur réel
+   n'est configuré, tout passe par « simulation » et est marqué comme tel. */
+var PROVIDERS={
+  simulation:{id:'simulation',label:'Simulation',real:false,configured:true,send:function(){return{ok:true};}},
+  sms:{id:'sms',label:'Fournisseur SMS',real:true,configured:false},
+  email:{id:'email',label:'Fournisseur email',real:true,configured:false}
+};
+var CHANNEL_PROVIDER={sms:'sms',email:'email'};
+function providerFor(ch){var p=PROVIDERS[CHANNEL_PROVIDER[ch]];return(p&&p.configured&&p.send)?p:PROVIDERS.simulation;}
+function queueMsg(c,stage,text,o){o=o||{};var m={id:uid(),clientId:c.id,stage:stage,text:text,status:'a_envoyer',channel:o.channel||null,auto:!!o.auto,type:o.type||'',createdAt:Date.now()};if(SERVERMODE)m.srv=true;S.messages.push(m);return m;}
+function markSent(m,channel,simulated){
+  m.status='envoye';m.channel=channel||m.channel||'sms';m.simulated=!!simulated||m.channel==='simulation';
+  m.sentAt=Date.now();m.sentDay=dstr(now());
+  var c=clientById(m.clientId);
+  if(c){c.stAt=Date.now();c.stage=m.stage;c.lastSentDay=m.sentDay;if(m.stage===1||!c.firstSentDay)c.firstSentDay=m.sentDay;c.relanced=true;if(m.type==='noshow')c.noshowDone=true;}
+  save();
+}
+function dispatch(m,c){
+  var e=enrich(c);
+  if(e.status==='exclure'||e.booked){m.status='annule';S.messages=S.messages.filter(function(x){return x!==m;});return false;}
+  if(PREPARE_ONLY)return true;
+  var p=providerFor(m.channel);
+  p.send(m,c);
+  markSent(m,m.channel,!p.real);
+  return true;
+}
+function stopIfBooked(c){
+  var e=enrich(c);
+  if((c.stage||0)>0&&e.booked&&e.status!=='exclure'){recover(c,false);return true;}
+  return false;
+}
+function runEngine(){
+  if(!S.auto.on||!S.auto.consent)return 0;
+  if(REMOTE){S.clients.forEach(stopIfBooked);return 0;} /* mode connecté : l'envoi est fait par le serveur */
+  var made=0;
+  S.clients.forEach(function(c){
+    if(stopIfBooked(c))return;
+    var e=enrich(c),el=eligibility(e,true);
+    if(!el.ok)return;
+    var m=queueMsg(c,el.stage,renderTpl(S.templates[el.stage-1],c,e.days),{channel:el.channel,auto:true,type:el.type});
+    if(dispatch(m,c))made++;
+  });
+  if(made)save();
+  return made;
+}
+function bulkRelance(){
+  var n=0;
+  S.clients.forEach(function(c){var e=enrich(c),el=eligibility(e,false);
+    if(el.ok){queueMsg(c,el.stage,renderTpl(S.templates[el.stage-1],c,e.days),{channel:el.channel,type:el.type});n++;}});
+  save();return n;
+}
+function phoneIntl(t){var d=digits(t);if(d.indexOf('00')===0)d=d.slice(2);else if(d.length===10)d=(d[0]==='0')?'33'+d.slice(1):'1'+d;return d;}
+function linkFor(channel,c,text){
+  if(channel==='whatsapp')return'https://wa.me/'+phoneIntl(c.tel)+'?text='+encodeURIComponent(text);
+  if(channel==='sms')return'sms:'+digits(c.tel)+'?&body='+encodeURIComponent(text);
+  if(channel==='email')return'mailto:'+encodeURIComponent(c.email)+'?subject='+encodeURIComponent('Ton prochain rendez-vous chez '+(S.profile.nom||''))+'&body='+encodeURIComponent(text);
+  return'';
+}
+function openExternal(url){try{var w=window.open(url,'_blank');if(w){try{w.opener=null;}catch(e){}return true;}return false;}catch(e){return false;}}
+function legacyCopy(t){try{var a=document.createElement('textarea');a.value=t;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();var ok=document.execCommand('copy');a.remove();return ok;}catch(e){return false;}}
+function copyText(t){
+  try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).catch(function(){legacyCopy(t);});return true;}}catch(e){}
+  return legacyCopy(t);
+}
+var toastT;
+function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.remove('hide');clearTimeout(toastT);toastT=setTimeout(function(){t.classList.add('hide');},3200);}
+
+/* ---------- vues ---------- */
+var ICON={
+  users:'<svg viewBox="0 0 24 24"><path d="M16 19v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 17.5V19"/><circle cx="10" cy="8" r="3.5"/><path d="M20 19v-1.5a3.5 3.5 0 0 0-2.5-3.35M15.5 4.65a3.5 3.5 0 0 1 0 6.7"/></svg>',
+  chat:'<svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>',
+  bolt:'<svg viewBox="0 0 24 24"><path d="M13 3L5 14h6l-1 7 8-11h-6z"/></svg>',
+  chart:'<svg viewBox="0 0 24 24"><path d="M3 20h18M6 20v-7M12 20V5M18 20v-10"/></svg>',
+  set:'<svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>',
+  down:'<svg width="18" height="22" viewBox="0 0 18 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v17M3 13l6 6 6-6"/></svg>'
+};
+var STATUS_LABEL={actif:'Actif',relancer:'À relancer',dormant:'Dormant',exclure:'À exclure'};
+var WHY_LABEL={optout:'Désabonné',contact:'Sans contact',date:'Sans date'};
+var CH_LABEL={whatsapp:'WhatsApp',sms:'SMS',email:'Email',simulation:'Simulation'};
+function pill(st){return '<span class="pill p-'+st+'">'+STATUS_LABEL[st]+'</span>';}
+var MARK='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.5L22.5 12 12 22.5 1.5 12z"/><path d="M1.5 12h21M12 1.5L8 12l4 10.5M12 1.5L16 12l-4 10.5"/></svg>';
+/* gemme : géométrie de facettes, utilisée en filigrane (landing, moment diamant) */
+var GEM='<svg viewBox="0 0 400 400" aria-hidden="true" preserveAspectRatio="xMidYMid meet"><path d="M110 60h180l90 90-180 230L20 150z"/><path d="M20 150h360M110 60l50 90 40 230 40-230 50-90M110 60l90 90 90-90M160 150l40-90 40 90M20 150l180 230M380 150L200 380"/></svg>';
+function logo(){return '<button class="brand" data-act="home" aria-label="D4U Private Barber, accueil">'+MARK+'<span class="wm"><b>D4U</b><small>Private Barber</small></span></button>';}
+function sw(on,act,v,label){return '<button type="button" class="switch" role="switch" aria-checked="'+(!!on)+'" aria-label="'+esc(label)+'" data-act="'+act+'" data-v="'+v+'"><i></i></button>';}
+function profileComplete(){var p=S.profile;return !!(p.nom&&p.lien&&p.contact);}
+function freqChips(){return FREQS.map(function(d){return '<button type="button" class="chip" data-act="freq" data-v="'+d+'" aria-pressed="'+(S.profile.freq===d)+'">'+d+' jours</button>';}).join('');}
+function adaptRow(){return '<div class="tog" style="margin-top:14px"><div><b>Laisser D4U ajuster par client</b><p class="hint">Si ton fichier contient l’historique des visites, D4U calcule le rythme de chaque client au lieu d’un seuil fixe.</p></div>'+sw(S.profile.adapt,'tog','adapt','Laisser D4U ajuster par client')+'</div>';}
+function potHint(){return 'Estimation prudente : '+Math.round(RECOUP*100)+' % des clients à récupérer reviennent, à '+money(+S.profile.prix||0)+' la coupe. Ce n’est pas une promesse : le résultat réel dépend de tes clients.';}
+function simTxt(){return realSend()?'D4U envoie les relances par SMS et email pendant les heures d’envoi'+(sync.hours?' ('+sync.hours+')':'')+', et s’arrête dès que le client réserve ou se désabonne.':'Mode simulation : D4U prépare et simule les relances, mais aucun SMS ni email n’est réellement envoyé tant qu’un fournisseur d’envoi n’est pas connecté.';}
+function provHint(ch){return realSend()?(sync.providers[ch]?'envoi réel':'fournisseur non connecté (simulation)'):'fournisseur non connecté (simulation)';}
+function stripHtml(items){
+  return '<div class="strip">'+items.map(function(x){return '<div><small>'+x[0]+'</small><b class="tnum">'+x[1]+'</b></div>';}).join('')+'</div>';
+}
+function segStrip(k){return stripHtml([['Actifs',fr(k.actif),''],['À relancer',fr(k.relancer),''],['Dormants',fr(k.dormant),''],['À exclure',fr(k.exclure),'']]);}
+function ruleText(){return 'D4U compare la dernière visite de chaque client à son rythme habituel : '+(S.profile.adapt?'calculé d’après son historique quand il existe, sinon ':'')+'tous les '+S.profile.freq+' jours. Dormant : absent depuis plus de 3 fois son rythme (60 jours minimum).';}
+
+function vLanding(){
+  var mockRows=[['Marcus','47 jours','relancer'],['Kevin','82 jours','dormant'],['Jordan','31 jours','relancer']].map(function(r){
+    return '<div class="mock-r"><span class="n">'+r[0]+'</span><span class="muted tnum">'+r[1]+'</span>'+pill(r[2])+'<span class="btn btn-sm" aria-hidden="true">Relancer</span></div>';}).join('');
+  var fun=[[127,'anciens clients',100],[43,'clients à relancer',34],[12,'rendez-vous récupérés',9.4]].map(function(f){
+    return '<div class="f-item"><div class="f-top"><b class="tnum">'+f[0]+'</b><span class="muted">'+f[1]+'</span></div><div class="f-bar"><i style="width:'+f[2]+'%"></i></div></div>';}).join('');
+  var steps=[['Importe tes clients','Exporte ta liste depuis ton logiciel habituel (CSV ou Excel) et importe-la ici.'],
+    ['D4U analyse ton fichier','Colonnes reconnues automatiquement, doublons fusionnés, rythme de visite calculé pour chaque client.'],
+    ['D4U trouve les clients à récupérer','Ceux qui ont dépassé leur rythme habituel, sans que tu comptes quoi que ce soit.'],
+    ['Active les relances automatiques','Ton lien de réservation et ta fréquence : une seule fois.'],
+    ['D4U s’occupe du reste','Qui, quand, quel canal, quel message : D4U décide. Il s’arrête dès que le client réserve.']].map(function(s,i){
+    return '<div class="step"><div class="num">0'+(i+1)+'</div><h3>'+s[0]+'</h3><p>'+s[1]+'</p></div>';}).join('');
+  return '<div class="wrap">'+
+  '<header class="top">'+logo()+(S.onboarded?'<button class="btn btn-sm" data-act="open-app">Mon espace</button>':'')+'</header><div class="hair"></div>'+
+  '<section class="hero"><div class="hero-fx">'+GEM+'</div><div class="hero-in">'+
+  '<h1 class="disp">Tes clients n’ont pas disparu.</h1>'+
+  '<p class="sub">D4U retrouve ceux qui ne sont pas revenus et les relance automatiquement.</p>'+
+  '<div class="cta"><button class="btn btn-primary" data-act="start">Récupérer mes clients</button><span class="faint" style="font-size:13px">Tu gardes ton logiciel de réservation. Un export suffit.</span></div></div></section>'+
+  '<section class="section"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:28px"><p class="eyebrow">Ton espace privé</p><span class="tag-ex">Exemple</span></div>'+
+  '<div class="mock" aria-label="Exemple de tableau de bord"><div class="mock-h"><div><div class="lab">Clients à récupérer</div><b class="tnum">151</b></div><span class="muted" style="font-size:14px;padding-top:2px"><span class="glyph">◇</span></span></div>'+mockRows+'</div></section>'+
+  '<section class="section"><p class="eyebrow">Sans rien changer</p><h2 class="disp">Garde ton logiciel de réservation.</h2><p class="sub2">Exporte ta liste de clients depuis l’outil que tu utilises déjà (Planity, Fresha, Square, Booksy, Rendez-vous par Simpli, un simple tableur…) et importe-la dans D4U. Les colonnes sont reconnues toutes seules, même si leurs noms changent.</p></section>'+
+  '<section class="section"><p class="eyebrow">Comment ça marche</p><h2 class="disp">Importer, configurer une fois, activer.</h2><div class="steps">'+steps+'</div></section>'+
+  '<section class="section"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px"><p class="eyebrow">Un exemple concret</p><span class="tag-ex">Chiffres d’exemple</span></div><h2 class="disp">Des clients qui dorment, des rendez-vous qui reviennent.</h2><div class="funnel">'+fun+'</div></section>'+
+  '<section class="section"><p class="eyebrow">Un prix simple</p><h2 class="disp">'+money(PLAN.prix)+' par mois.</h2><p class="sub2">Si D4U récupère un seul client à '+money(+S.profile.prix||35)+', ton abonnement est déjà couvert en chiffre d’affaires brut. Ce n’est pas une garantie : c’est le calcul à faire.</p><p class="faint" style="margin-top:20px;font-size:13.5px;letter-spacing:.04em">'+PLAN.sms+' SMS inclus · email inclus · clients illimités · sans engagement</p><p class="faint" style="margin-top:8px;font-size:13.5px">Founding Barber : '+money(PLAN.fondateur)+' par mois pendant '+PLAN.mois+' mois pour les premiers barbiers.</p></section>'+
+  '<section class="final"><h2 class="disp">Tu n’as pas besoin de trouver plus de clients. Commence par récupérer ceux que tu as déjà.</h2><div style="margin-top:44px"><button class="btn btn-primary" data-act="start">Récupérer mes clients</button></div></section>'+
+  '<footer class="foot"><span class="glyph">◇</span> D4U Private Barber · version de test. '+(BACKEND?'Tes données sont sauvegardées sur ton compte.':'Tes données restent dans ton navigateur.')+'</footer></div>';
+}
+
+function vAuth(){
+  return '<div class="wrap"><header class="top">'+logo()+'</header><div class="narrow" style="padding-block:40px 60px"><p class="eyebrow">Ton espace privé</p><h1 class="disp h1" style="margin:12px 0 28px">Connexion</h1><div class="card">'+
+    '<div class="field"><label for="a-email">Email</label><input class="input" id="a-email" type="email" autocomplete="email" inputmode="email" autocapitalize="off" value="'+esc(ui.authEmail||'')+'"></div>'+
+    '<div class="field"><label for="a-pass">Mot de passe</label><input class="input" id="a-pass" type="password" autocomplete="current-password"><span class="hint">8 caractères minimum.</span></div>'+
+    (ui.authMsg?'<p class="'+(/créé/.test(ui.authMsg)?'hint':'err')+'" role="alert" style="margin:-6px 0 16px">'+esc(ui.authMsg)+'</p>':'')+
+    '<button class="btn btn-primary btn-block" data-act="auth-in"'+(ui.authBusy?' disabled':'')+'>'+(ui.authBusy?'Connexion…':'Se connecter')+'</button>'+
+    '<div style="margin-top:12px"><button class="btn btn-block" data-act="auth-up"'+(ui.authBusy?' disabled':'')+'>Créer mon compte</button></div></div>'+
+    '<p class="hint" style="margin-top:18px;text-align:center">Chaque barbier ne voit que ses propres clients.</p></div></div>';
+}
+function syncTxt(){return sync.state==='ok'?'◇ Synchronisé. Tes données sont sauvegardées sur ton compte.':sync.state==='saving'?'Synchronisation…':sync.state==='error'?'Synchronisation impossible pour l’instant : tes modifications sont gardées sur cet appareil et repartiront automatiquement.':'';}
+function enter(){if(S.onboarded)go('app','clients');else{ui.step=S.clients.length?3:1;ui.errors={};ui.imp=null;go('onboarding');}}
+function fieldErr(k){return ui.errors[k]?'<span class="err" id="e-'+k+'">'+esc(ui.errors[k])+'</span>':'';}
+var STEP_LABEL=['','Étape 1 sur 4 · Importe tes clients','Étape 2 sur 4 · D4U analyse ton fichier','Étape 3 sur 4 · Configure une fois','Étape 4 sur 4 · Active les relances'];
+
+function vImportStep(){
+  var err='';
+  if(ui.importErr){var e=ui.importErr;err='<div class="alert" role="alert"><b>'+esc(e.title)+'</b><span>'+esc(e.msg)+'</span></div>';}
+  return '<h1 class="disp h1">Importe tes clients</h1><p class="muted" style="margin:10px 0 24px">Exporte ta liste de clients depuis ton logiciel habituel, en CSV ou en Excel. D4U reconnaît les colonnes tout seul.</p>'+
+    '<label class="drop" for="f-file"><b>'+(ui.busy?'Lecture du fichier…':'Choisis ton fichier CSV ou Excel')+'</b><span class="muted" style="font-size:14px">ou glisse-le ici</span></label><input type="file" id="f-file" accept=".csv,.tsv,.txt,.xlsx,.xls,text/csv" style="position:absolute;width:1px;height:1px;opacity:0">'+
+    '<div class="divider">ou</div><div class="field" style="margin-bottom:10px"><label for="f-paste">Colle ton tableau ici</label><textarea class="ta" id="f-paste" placeholder="First Name, Last Name, Phone, Email, Last Visit" style="min-height:96px"></textarea></div><button class="btn btn-block" data-act="paste-import">Analyser mes clients</button>'+err+
+    '<div class="card" style="margin-top:22px;padding:16px"><p class="lbl" style="margin-bottom:6px">Aucun format à respecter</p><p class="hint">Prénom, First Name, Phone, Mobile, Last Appointment… D4U s’adapte. Un client peut aussi apparaître sur plusieurs lignes (une par rendez-vous) : D4U les regroupe.</p></div>'+
+    '<div style="margin-top:20px;display:flex;justify-content:space-between;align-items:center;gap:12px">'+(ui.fromSettings?'<button class="btn-link" data-act="cancel-import">Annuler</button>':'<span></span>')+'<button class="btn-link" data-act="sample">Essayer avec des clients d’exemple</button></div>';
+}
+
+function vMapStep(){
+  var imp=ui.imp,pv=buildClients(imp),miss=requiredMissing(imp.map),f=pv.found;
+  var colField={};Object.keys(imp.map).forEach(function(k){colField[imp.map[k]]=k;});
+  function sample(i){for(var r=0;r<imp.rows.length;r++){var v=String(imp.rows[r][i]==null?'':imp.rows[r][i]).trim();if(v)return v.length>26?v.slice(0,26)+'…':v;}return '';}
+  function row(i){
+    var cur=colField[i]||'',opts='<option value="">Ignorer cette colonne</option>'+FIELDS.map(function(x){return '<option value="'+x.k+'"'+(cur===x.k?' selected':'')+'>'+x.l+'</option>';}).join('');
+    var hint=(cur&&imp.src[cur]==='content')?'<span class="hint"> · reconnu d’après le contenu</span>':'';
+    return '<div class="map-row"><div class="map-l"><b>'+esc(imp.headers[i]||'(sans titre)')+'</b>'+hint+'<span class="hint">'+esc(sample(i))+'</span></div><span class="arrow" aria-hidden="true">→</span><select class="input map-sel" id="m-'+i+'" data-bind="map" data-col="'+i+'" aria-label="Colonne '+esc(imp.headers[i])+'">'+opts+'</select></div>';
+  }
+  var rec=[],oth=[];imp.headers.forEach(function(h,i){(colField[i]?rec:oth).push(i);});
+  var found=[[f.clients,'clients'],[f.tel,'numéros de téléphone'],[f.email,'adresses email'],[f.last,'dates de dernière visite']].map(function(x){return '<div class="found-r"><b class="tnum">'+fr(x[0])+'</b><span>'+x[1]+'</span></div>';}).join('');
+  var ready=!miss.length&&f.clients>0;
+  return '<p class="eyebrow">Nous avons trouvé :</p><div class="found">'+found+'</div>'+
+    (ready?'<p class="ready"><b>Tout est prêt.</b></p>':'<div class="alert" role="alert"><b>Il manque une information</b><span>Choisis dans la liste ci-dessous la colonne qui contient : '+miss.join(', ')+'.</span></div>')+
+    (pv.skipped.dupes?'<p class="hint" style="margin-top:8px">'+fr(pv.skipped.dupes)+' ligne'+(pv.skipped.dupes>1?'s':'')+' regroupée'+(pv.skipped.dupes>1?'s':'')+' (même client).</p>':'')+
+    '<div class="card" style="margin-top:20px;padding:16px"><p class="lbl">Votre fichier → D4U</p><p class="hint" style="margin:2px 0 6px">Vérifie que chaque colonne va au bon endroit. Change-la si besoin.</p>'+rec.map(row).join('')+
+    (oth.length?'<details class="others" id="others"'+((miss.length||ui.othersOpen)?' open':'')+'><summary>'+oth.length+' autre'+(oth.length>1?'s':'')+' colonne'+(oth.length>1?'s':'')+' non utilisée'+(oth.length>1?'s':'')+'</summary>'+oth.map(row).join('')+'</details>':'')+'</div>'+
+    '<div style="margin-top:20px"><button class="btn btn-primary btn-block" data-act="analyze"'+(ready?'':' disabled')+'>Analyser mes clients</button></div>'+
+    '<div style="margin-top:14px;text-align:center"><button class="btn-link" data-act="newfile">Choisir un autre fichier</button></div>';
+}
+
+function vConfigStep(){
+  var p=S.profile;
+  return '<h1 class="disp h1">Configure une fois</h1><p class="muted" style="margin:10px 0 24px">Ces infos servent à personnaliser tes messages. Tu ne les redonneras plus.</p><div class="card">'+
+    '<div class="field"><label for="f-nom">Nom du barber ou du salon</label><input class="input'+(ui.errors.nom?' bad':'')+'" id="f-nom" value="'+esc(p.nom)+'" placeholder="Ex. Studio Cuts" autocomplete="organization">'+fieldErr('nom')+'</div>'+
+    '<div class="field"><label for="f-lien">Lien de réservation</label><input class="input'+(ui.errors.lien?' bad':'')+'" id="f-lien" value="'+esc(p.lien)+'" placeholder="https://ton-lien-de-reservation.com" inputmode="url" autocapitalize="off"><span class="hint">Booksy, Square, Planity, Calendly, ton site… Il sera ajouté à chaque message.</span>'+fieldErr('lien')+'</div>'+
+    '<div class="field"><label for="f-contact">Téléphone ou email</label><input class="input'+(ui.errors.contact?' bad':'')+'" id="f-contact" value="'+esc(p.contact)+'" placeholder="514 555 0123 ou toi@salon.com" autocapitalize="off">'+fieldErr('contact')+'</div>'+
+    '<div class="field" style="margin-bottom:0"><span class="lbl">Fréquence habituelle de tes clients</span><div class="chips" role="group" aria-label="Fréquence">'+freqChips()+'</div><span class="hint">Un client qui dépasse ce délai sera à relancer.</span></div>'+adaptRow()+'</div>'+
+    '<div style="margin-top:20px"><button class="btn btn-primary btn-block" data-act="to-result">Trouver mes clients à récupérer</button></div>';
+}
+
+function potBlock(k){
+  var pt=potential(k);if(!pt.clients)return '';
+  return '<div class="pot"><div class="lab">CA potentiel estimé</div><div class="pot-n tnum">≈ '+money(pt.ca)+'</div><p class="pot-t">≈ '+fr(pt.clients)+' client'+(pt.clients>1?'s':'')+' récupérable'+(pt.clients>1?'s':'')+'.</p><p class="hint" style="margin-top:8px">'+potHint()+'</p></div>';
+}
+function vResultStep(){
+  var r=ui.impRes||{added:S.clients.length,updated:0,rebooked:0,dupes:0,ignored:0},k=counts(),rec=k.relancer+k.dormant,notes=[];
+  if(r.sample)notes.push('clients d’exemple');
+  else{notes.push(fr(r.added)+' nouveau'+(r.added>1?'x':'')+' client'+(r.added>1?'s':''));
+    if(r.updated)notes.push(fr(r.updated)+' mis à jour');
+    if(r.rebooked)notes.push(fr(r.rebooked)+' rendez-vous repris détecté'+(r.rebooked>1?'s':''));
+    if(r.dupes)notes.push(fr(r.dupes)+' doublon'+(r.dupes>1?'s':'')+' fusionné'+(r.dupes>1?'s':''));
+    if(r.ignored)notes.push(fr(r.ignored)+' ligne'+(r.ignored>1?'s':'')+' sans prénom ignorée'+(r.ignored>1?'s':''));}
+  var act=S.auto.on?'<button class="btn btn-primary btn-block" data-act="see-app">Voir mes clients à récupérer</button>':
+    '<label class="check" for="f-consent"><input type="checkbox" id="f-consent"'+(S.auto.consent?' checked':'')+'><span>Mes clients m’ont donné leur accord pour être contactés (ou je respecte la loi applicable). Chaque message contient une option pour se désabonner.</span></label>'+
+    '<button class="btn btn-primary btn-block" data-act="activate" style="margin-top:14px">Activer les relances automatiques</button>'+
+    '<div style="margin-top:14px;text-align:center"><button class="btn-link" data-act="skip-activate">Voir mes clients sans activer</button></div>'+
+    '<p class="hint" style="margin-top:14px">'+simTxt()+'</p>';
+  return '<p class="lab">D4U a trouvé</p><div class="bignum tnum" style="margin-top:20px">'+fr(rec)+'</div><p class="muted big-l">clients à récupérer, sur '+fr(k.total)+' clients analysés.</p>'+potBlock(k)+
+    '<div style="margin-top:32px">'+segStrip(k)+'</div><p class="hint" style="margin-top:14px">'+notes.join(' · ')+'.</p><div style="margin-top:32px">'+act+'</div>';
+}
+
+function vOnboard(){
+  var st=ui.step,h='';
+  var prog='<div class="prog"><div class="bar"><i style="width:'+(st*25)+'%"></i></div><p class="eyebrow">'+STEP_LABEL[st]+'</p></div>';
+  if(st===1)h=vImportStep();else if(st===2&&ui.imp)h=vMapStep();else if(st===3)h=vConfigStep();else h=vResultStep();
+  return '<div class="wrap"><header class="top">'+logo()+'</header><div class="narrow" style="padding-bottom:60px">'+prog+h+'</div></div>';
+}
+
+function vApp(){
+  var tabs=[['clients','Clients',ICON.users],['messages','Messages',ICON.chat],['auto','Automations',ICON.bolt],['results','Résultats',ICON.chart],['settings','Réglages',ICON.set]];
+  var nav='<nav class="nav" aria-label="Navigation">'+tabs.map(function(t){return '<button data-act="tab" data-v="'+t[0]+'"'+(ui.tab===t[0]?' aria-current="page"':'')+'>'+t[2]+'<span>'+t[1]+'</span></button>';}).join('')+'</nav>';
+  var body=ui.tab==='clients'?tClients():ui.tab==='messages'?tMessages():ui.tab==='auto'?tAuto():ui.tab==='results'?tResults():tSettings();
+  return '<div class="wrap"><header class="app-top">'+logo()+nav+'<span class="who">'+esc(S.profile.nom)+'</span></header><div class="hair"></div><main class="app-main">'+body+'</main></div>';
+}
+
+function tClients(){
+  var k=counts(),st=stats(),rec=k.relancer+k.dormant,f=ui.filter;
+  var list=S.clients.map(function(c){var e=enrich(c);e.el=eligibility(e,false);return e;});
+  list=list.filter(function(e){return f==='all'||(f==='actif'&&e.status==='actif')||(f==='exclure'&&e.status==='exclure')||(f==='recover'&&(e.status==='relancer'||e.status==='dormant'));});
+  var rank=function(e){var r=e.el.reason;return e.el.ok?0:r==='queued'?1:r==='wait'?2:3;};
+  list.sort(function(a,b){return f==='actif'?a.days-b.days:(rank(a)-rank(b))||((b.days||0)-(a.days||0));});
+  var total=list.length,shown=list.slice(0,ui.shown);
+  var rows=shown.map(function(e){
+    var c=e.c,el=e.el,act='';
+    if(el.ok)act='<button class="btn btn-primary btn-sm" data-act="open-client" data-id="'+c.id+'">'+(el.stage===1?'Relancer':'Relance '+el.stage)+'</button>';
+    else if(el.reason==='queued')act='<button class="btn btn-sm" data-act="open-client" data-id="'+c.id+'">À envoyer</button>';
+    else if(el.reason==='wait')act='<span class="wait">Relance '+el.stage+' dans '+el.inDays+' j</span>';
+    else if(el.reason==='replied')act='<span class="wait">A répondu</span>';
+    else if(el.reason==='done')act='<span class="wait">3 relances faites</span>';
+    else if(el.reason==='exclu')act='<span class="wait">'+WHY_LABEL[el.why]+'</span>';
+    else if(el.reason==='off')act='<span class="wait">Automation désactivée</span>';
+    else if(c.recovered)act='<span class="wait">RDV repris</span>';
+    return '<div class="row" data-act="open-client" data-id="'+c.id+'"><div class="c-name">'+esc(c.prenom)+(c.nom?' <span class="muted" style="font-weight:400">'+esc(c.nom)+'</span>':'')+'</div>'+
+      '<div class="c-info"><span class="c-visit">'+(c.lastVisit?fmtDate(c.lastVisit):'—')+'</span><span class="c-days tnum">'+(e.days==null?'—':e.days+' jours')+'</span><span class="c-status">'+pill(e.status)+'</span></div><div class="c-act">'+act+'</div></div>';
+  }).join('');
+  var seg=[['recover','À récupérer ('+fr(rec)+')'],['actif','Actifs ('+fr(k.actif)+')'],['exclure','À exclure ('+fr(k.exclure)+')'],['all','Tous ('+fr(k.total)+')']].map(function(s){return '<button class="chip" data-act="filter" data-v="'+s[0]+'" aria-pressed="'+(f===s[0])+'">'+s[1]+'</button>';}).join('');
+  var pot=potential(k),on=S.auto.on&&S.auto.consent;
+  var bulkBtn='<button class="btn'+((on&&k.eligible)?' btn-primary':'')+' btn-block" data-act="bulk"'+(k.eligible?'':' disabled')+'>'+(k.eligible?'Relancer '+fr(k.eligible)+' client'+(k.eligible>1?'s':''):'Rien à relancer pour l’instant')+'</button>';
+  var autoBtn=on?'':'<button class="btn btn-primary btn-block" data-act="goto-auto">Activer les relances automatiques</button>';
+  var autoRow='<div class="auto-row"><div><div class="lab">Relances automatiques</div><p>'+(on?'Actives : D4U décide qui, quand et par quel canal. '+(realSend()?'Envoi réel pendant les heures d’envoi'+(sync.hours?' ('+sync.hours+')':'')+'.':'Mode simulation : aucun message réel n’est envoyé.'):'Désactivées : rien ne part tant que tu ne les actives pas.')+'</p></div><div class="onoff '+(on?'on':'off')+'" aria-label="Relances automatiques '+(on?'activées':'désactivées')+'">'+(on?'ON':'OFF')+'</div></div>';
+  return '<section class="hero-app"><p class="eyebrow">Overview</p><div class="lab" style="margin-top:36px">Clients à récupérer</div><div class="bignum tnum" style="margin-top:18px">'+fr(rec)+'</div>'+
+    '<p class="muted big-l">sur <b style="color:var(--text);font-weight:500">'+fr(k.total)+'</b> clients analysés</p>'+(pot.clients?'<p class="pot-line"><span class="glyph">◇</span> ≈ <b class="tnum">'+money(pot.ca)+'</b> de CA potentiel <span class="faint">· estimation</span></p>':'')+
+    '<div style="margin-top:32px;display:grid;gap:12px;width:100%">'+(on?bulkBtn:autoBtn+bulkBtn)+
+    (k.queued?'<button class="btn-link" style="justify-self:start" data-act="open-queue">Voir la file d’envoi ('+k.queued+' à envoyer)</button>':'')+'</div>'+
+    '<div style="margin-top:48px">'+segStrip(k)+'</div>'+autoRow+
+    '<div style="margin-top:28px">'+stripHtml([['Analysés',fr(st.analyzed),''],['Relances auto',fr(st.auto),''],['RDV récupérés',fr(st.recovered),''],['CA récupéré',money(st.revenue),'']])+'</div>'+
+    '<p class="hint" style="margin-top:18px">'+ruleText()+'</p>'+
+    (st.auto&&st.auto===st.simulated?'<p class="hint" style="margin-top:6px">Relances simulées : rien n’est parti réellement.</p>':'')+
+    (S.sample?'<div class="note" style="margin-top:20px">Clients d’exemple. Importe ton vrai fichier dans Réglages.</div>':'')+'</section>'+
+    '<div class="seg" role="group" aria-label="Filtre">'+seg+'</div>'+
+    '<div class="list"><div class="thead"><span>Prénom</span><span>Dernière visite</span><span>Jours</span><span>Statut</span><span></span></div>'+
+    (rows||'<div class="empty">Aucun client dans cette liste.</div>')+'</div>'+
+    (total>shown.length?'<div style="text-align:center;margin-top:16px"><button class="btn btn-sm" data-act="more">Voir plus ('+(total-shown.length)+')</button></div>':'');
+}
+
+function exampleClient(){
+  var l=S.clients.map(enrich).filter(function(e){return e.status==='relancer'||e.status==='dormant';}).sort(function(a,b){return a.days-b.days;});
+  return l.length?{c:l[0].c,days:l[0].days}:{c:{prenom:'Marcus',nom:'T.'},days:47};
+}
+function tMessages(){
+  var ex=exampleClient(),titles=['Relance 1','Relance 2','Relance 3'];
+  var cards=[0,1,2].map(function(i){
+    var delay=i===0?'<label class="delay" for="d1">Envoyée <input class="input" id="d1" type="number" min="0" max="60" inputmode="numeric" value="'+S.delays.r1+'" data-bind="delay1"> jours après la date de retour prévue du client</label>':
+      '<label class="delay" for="d'+(i+1)+'">Envoyée <input class="input" id="d'+(i+1)+'" type="number" min="1" max="60" inputmode="numeric" value="'+S.delays['r'+(i+1)]+'" data-bind="delay'+(i+1)+'"> jours après la '+(i===1?'première':'deuxième')+' relance, sans réservation</label>';
+    var vars=['prenom','lien_reservation','barbier'].map(function(v){return '<button type="button" class="var" data-act="ins" data-i="'+i+'" data-v="{{'+v+'}}">{{'+v+'}}</button>';}).join('');
+    return '<div class="card tpl"><div class="tpl-h"><h3>'+titles[i]+'</h3></div><div style="margin-bottom:12px">'+delay+'</div>'+
+      '<label class="lbl" for="tpl'+i+'">Message</label><textarea class="ta" id="tpl'+i+'" data-bind="tpl'+i+'" style="margin-top:6px">'+esc(S.templates[i])+'</textarea>'+
+      '<div class="vars">'+vars+'<button type="button" class="btn-link" data-act="tpl-reset" data-i="'+i+'" style="margin-left:auto">Rétablir</button></div>'+
+      '<p class="hint" style="margin-top:14px">Aperçu pour '+esc(ex.c.prenom)+'</p><div class="bubble" id="prev'+i+'">'+esc(renderTpl(S.templates[i],ex.c,ex.days))+'</div></div>';}).join('');
+  return '<section class="hero-app"><p class="eyebrow">Messages automatiques</p><h1 class="disp h1" style="margin-top:12px">3 relances, espacées</h1><p class="muted" style="margin:10px 0 20px">Modifie le texte comme tu veux. D4U ajoute ton lien de réservation si tu l’oublies, et la mention « STOP » pour se désabonner.</p>'+cards+'</section>';
+}
+
+function tAuto(){
+  var k=counts(),A=S.auto,on=A.on&&A.consent,rec=k.relancer+k.dormant;
+  function row(label,desc,key,on2){return '<div class="tog"><div><b>'+label+'</b><p class="hint">'+desc+'</p></div>'+sw(on2,'tog',key,label)+'</div>';}
+  var noshowHint=k.noshow?fr(k.noshow)+' client'+(k.noshow>1?'s':'')+' concerné'+(k.noshow>1?'s':''):'Aucune donnée de rendez-vous manqué dans ton fichier.';
+  return '<section class="hero-app"><p class="eyebrow">Automations</p><h1 class="disp h1" style="margin:12px 0 24px">D4U s’occupe du reste</h1>'+
+    '<div class="card"><div class="tog"><div><b>Relances automatiques</b><p class="hint">'+(on?'Actives : D4U relance les clients en retard sans que tu regardes la liste.':'Désactivées : rien ne part tant que tu ne les actives pas.')+'</p></div>'+sw(on,'master','on','Relances automatiques')+'</div>'+
+    '<label class="check" for="a-consent" style="margin-top:14px"><input type="checkbox" id="a-consent" data-bind="consent"'+(A.consent?' checked':'')+'><span>Mes clients m’ont donné leur accord pour être contactés (ou je respecte la loi applicable). Chaque message contient une option pour se désabonner.</span></label>'+
+    '<div class="note" style="margin-top:14px"><b style="color:var(--text)">'+(realSend()?'Envoi réel.':'Mode simulation.')+'</b> '+(realSend()?'D4U envoie les SMS et emails pendant les heures d’envoi'+(sync.hours?' ('+sync.hours+')':'')+'. Les canaux sans fournisseur restent simulés.':'D4U prépare et simule les envois, mais aucun SMS ni email n’est réellement envoyé tant qu’un fournisseur n’est pas connecté.')+'</div></div>'+
+    '<div class="card" style="margin-top:16px"><p class="lbl">Ce que D4U décide, à ta place</p><div class="decide">'+
+    '<div><b>Qui</b><span>Les clients qui ont dépassé leur rythme habituel : '+fr(rec)+' aujourd’hui.</span></div>'+
+    '<div><b>Quand</b><span>Relance 1 : '+S.delays.r1+' j après la date de retour prévue. Relance 2 : +'+S.delays.r2+' j. Relance 3 : +'+S.delays.r3+' j. Arrêt immédiat dès que le client réserve ou se désabonne.</span></div>'+
+    '<div><b>Canal</b><span>SMS pour les relances 1 et 3, email pour la 2 quand le client a les deux. Sinon, le canal disponible.</span></div>'+
+    '<div><b>Message</b><span>Tes 3 messages, personnalisés avec le prénom et ton lien de réservation.</span></div></div></div>'+
+    '<div class="card" style="margin-top:16px"><p class="lbl" style="margin-bottom:4px">Ce qui déclenche une relance</p>'+
+    row('Relance après rendez-vous manqué',noshowHint,'noshow',A.noshow)+
+    row('Relance client en retard',fr(k.relancer)+' client'+(k.relancer>1?'s':'')+' concerné'+(k.relancer>1?'s':''),'retard',A.retard)+
+    row('Relance client dormant',fr(k.dormant)+' client'+(k.dormant>1?'s':'')+' concerné'+(k.dormant>1?'s':''),'dormant',A.dormant)+
+    '</div><div class="card" style="margin-top:16px"><p class="lbl" style="margin-bottom:4px">Par quel canal</p>'+
+    row('Email',fr(k.email)+' client'+(k.email>1?'s':'')+' avec une adresse · '+provHint('email'),'email',A.email)+
+    row('SMS',fr(k.tel)+' client'+(k.tel>1?'s':'')+' avec un numéro · '+provHint('sms'),'sms',A.sms)+
+    '</div><div class="card" style="margin-top:16px"><p class="lbl">Désabonnés</p><p class="muted" style="margin-top:4px;font-size:14px">'+fr(k.optout)+' client'+(k.optout>1?'s':'')+' désabonné'+(k.optout>1?'s':'')+' : ils ne recevront plus jamais de relance, même après un nouvel import.</p></div></section>';
+}
+
+function msgLabel(m){return CH_LABEL[m.channel]+(isSim(m)&&m.channel!=='simulation'?' (simulation)':'');}
+function ago(s){var d=daysSince(s);return d<=0?'aujourd’hui':d===1?'hier':'il y a '+d+' j';}
+function roiHtml(s){
+  var cover=s.revenue>=PLAN.prix,unit=+S.profile.prix||0,body;
+  if(s.recovered&&cover)body='<p class="roi-t"><span class="glyph">◇</span> Ton abonnement est couvert par les rendez-vous récupérés.</p><p class="hint" style="margin-top:8px">'+money(s.revenue)+' de CA attribuable estimé, soit environ ×'+(Math.round(s.revenue/PLAN.prix*10)/10).toString().replace('.',',')+' le prix de l’abonnement (chiffre d’affaires brut, pas un bénéfice).</p>';
+  else if(s.recovered)body='<p class="roi-t">'+money(s.revenue)+' récupérés sur '+money(PLAN.prix)+' d’abonnement.</p><p class="hint" style="margin-top:8px">Encore '+Math.ceil((PLAN.prix-s.revenue)/(unit||1))+' rendez-vous récupéré'+(Math.ceil((PLAN.prix-s.revenue)/(unit||1))>1?'s':'')+' pour couvrir l’abonnement en CA brut.</p>';
+  else body='<p class="roi-t">Un seul client récupéré à '+money(unit)+' couvre déjà l’abonnement en CA brut.</p><p class="hint" style="margin-top:8px">Ce n’est pas une garantie de résultat.</p>';
+  return '<div class="roi"><div class="lab">ROI de D4U · '+money(PLAN.prix)+' / mois</div>'+body+'</div>';
+}
+function momentHtml(s){
+  if(!s.recovered)return '';
+  return '<div class="moment">'+GEM+'<p class="mo-t"><span class="glyph">◇</span><span class="tnum">'+fr(s.recovered)+'</span> client'+(s.recovered>1?'s':'')+' récupéré'+(s.recovered>1?'s':'')+'</p>'+(s.revenue?'<p class="mo-s tnum">'+money(s.revenue)+' de CA chiffré</p><p class="hint">Estimation : rendez-vous récupérés × prix moyen d’une coupe.</p>':'')+'</div>';
+}
+function tResults(){
+  var s=stats(),allSim=s.sent>0&&s.simulated===s.sent;
+  var tiles=[[s.relanced,'clients relancés',''],[s.sent,allSim?'messages simulés':'messages envoyés',(!allSim&&s.simulated)?'dont '+s.simulated+' simulés':''],[s.replied,'réponses',''],[s.recovered,'rendez-vous récupérés','']].map(function(t){
+    return '<div class="tile"><b class="tnum">'+fr(t[0])+'</b><small>'+t[1]+'</small>'+(t[2]?'<div class="hint">'+t[2]+'</div>':'')+'</div>';}).join('');
+  var hist=S.messages.filter(function(m){return m.status==='envoye';}).sort(function(a,b){return b.sentAt-a.sentAt;}).slice(0,8).map(function(m){
+    var c=clientById(m.clientId);if(!c)return '';
+    return '<div class="hist-r"><span><b>'+esc(c.prenom)+'</b> <span class="muted">· Relance '+m.stage+(m.auto?' · auto':'')+'</span></span><span class="muted" style="font-size:13px;text-align:right">'+msgLabel(m)+' · '+ago(m.sentDay)+'</span></div>';}).join('');
+  return '<section class="hero-app"><p class="eyebrow" style="margin-bottom:28px">Résultats</p>'+momentHtml(s)+roiHtml(s)+'<div class="rate"><div class="bignum sm tnum">'+pct(s.rate)+'</div><span class="muted">de récupération</span></div>'+
+    '<p class="muted" style="margin-top:10px">'+(s.relanced?fr(s.recovered)+' rendez-vous récupérés sur '+fr(s.relanced)+' clients relancés.':'Aucune relance pour l’instant.')+
+    '</p>'+
+    '<div class="tiles">'+tiles+'</div><p class="hint" style="margin-top:12px">Le CA récupéré est une estimation : rendez-vous récupérés × prix moyen d’une coupe.</p>'+
+    '<div class="card" style="margin-top:20px"><div class="sect-t" style="margin-bottom:4px"><h2>Historique</h2></div>'+(hist?'<div class="hist">'+hist+'</div>':'<p class="muted" style="padding-block:8px">Aucun message pour l’instant.</p>')+'</div>'+
+    (s.simulated?'<p class="hint" style="margin-top:12px">Les messages « simulation » n’ont pas été envoyés réellement : ils servent à tester le parcours.</p>':'')+'</section>';
+}
+
+function tSettings(){
+  var p=S.profile,li=S.lastImport;
+  return '<section class="hero-app"><p class="eyebrow">Réglages</p><h1 class="disp h1" style="margin:12px 0 24px">Ton salon</h1><div class="card">'+
+    '<div class="field"><label for="s-nom">Nom du barber ou du salon</label><input class="input" id="s-nom" data-bind="set" value="'+esc(p.nom)+'"></div>'+
+    '<div class="field"><label for="s-lien">Lien de réservation</label><input class="input" id="s-lien" data-bind="set" value="'+esc(p.lien)+'" inputmode="url" autocapitalize="off"><span class="err" id="s-lien-err"></span></div>'+
+    '<div class="field"><label for="s-contact">Téléphone ou email</label><input class="input" id="s-contact" data-bind="set" value="'+esc(p.contact)+'" autocapitalize="off"></div>'+
+    '<div class="field" style="margin-bottom:0"><span class="lbl">Fréquence habituelle de tes clients</span><div class="chips">'+freqChips()+'</div></div>'+adaptRow()+
+    '<div class="field" style="margin:18px 0 0"><label for="s-prix">Prix moyen d’une coupe ($)</label><input class="input" id="s-prix" data-bind="set" type="number" min="0" inputmode="decimal" value="'+esc(p.prix)+'" style="max-width:140px"><span class="hint">Sert à estimer le chiffre d’affaires récupéré.</span></div></div>'+
+    '<div class="card" style="margin-top:16px"><p class="lbl">Clients</p><p class="muted" style="margin:4px 0 14px;font-size:14px">'+fr(S.clients.length)+' clients. Exporte ton fichier régulièrement depuis ton logiciel et importe-le ici : D4U met à jour les clients existants, ajoute les nouveaux, et arrête les relances de ceux qui ont repris rendez-vous.'+(li?' Dernier import : '+fr(li.added)+' nouveaux, '+fr(li.updated)+' mis à jour.':'')+'</p><button class="btn" data-act="reimport">Importer un nouveau fichier</button></div>'+
+    (BACKEND&&sess?'<div class="card" style="margin-top:16px"><p class="lbl">Compte</p><p class="muted" style="margin:6px 0 4px;font-size:14px">'+esc(sess.user.email)+'</p><p class="hint">'+syncTxt()+'</p><div style="margin-top:14px"><button class="btn" data-act="signout">Se déconnecter</button></div></div>':'')+
+    '<div class="card" style="margin-top:16px"><p class="lbl">Abonnement D4U Private</p><p style="margin:8px 0 4px;font:300 30px/1.1 var(--display);letter-spacing:.06em" class="tnum">'+money(PLAN.prix)+' <span class="muted" style="font-size:15px;letter-spacing:.12em">/ MOIS</span></p><p class="muted" style="font-size:14px">'+PLAN.sms+' SMS inclus · email inclus · clients illimités · sans engagement. SMS supplémentaire : '+String(PLAN.extra).replace('.',',')+' $. Offre Founding Barber : '+money(PLAN.fondateur)+' / mois pendant '+PLAN.mois+' mois.</p><p class="hint" style="margin-top:10px">Version test : rien n’est facturé.</p></div>'+
+    '<div class="card" style="margin-top:16px"><p class="lbl">Données</p><p class="muted" style="margin:4px 0 14px;font-size:14px">'+(BACKEND?'Tes données sont sauvegardées sur ton compte D4U et visibles uniquement par toi.':'Tout est stocké dans ce navigateur. Rien n’est envoyé sur un serveur.')+'</p><button class="btn" data-act="reset">'+(ui.confirmReset?'Confirmer : tout effacer':'Effacer toutes mes données')+'</button></div></section>';
+}
+
+function vSheet(){
+  if(!ui.sheet)return '';
+  var inner=ui.sheet==='queue'?sQueue():sClient(ui.sheet);
+  if(!inner)return '';
+  return '<div class="overlay" role="dialog" aria-modal="true"><div class="sheet">'+inner+'</div></div>';
+}
+function sClient(id){
+  var c=clientById(id);if(!c)return '';
+  var e=enrich(c),el=eligibility(e,false),pm=pending(c),stage=pm?pm.stage:(el.ok?el.stage:null),body='';
+  if(stage){
+    var noTel=!c.tel;
+    body='<p class="lbl">Relance '+stage+' sur 3'+(el.channel?' · canal conseillé : '+CH_LABEL[el.channel]:'')+'</p><textarea class="ta" id="draft" data-bind="draft" style="margin-top:6px">'+esc(ui.draftMsg)+'</textarea>'+
+    '<div class="acts"><button class="btn btn-primary" data-act="send" data-ch="whatsapp"'+(noTel?' disabled':'')+'>WhatsApp</button><button class="btn" data-act="send" data-ch="sms"'+(noTel?' disabled':'')+'>SMS</button>'+
+    (c.email?'<button class="btn" data-act="send" data-ch="email">Email</button>':'')+'<button class="btn" data-act="copy">Copier le message</button>'+
+    '<button class="btn-link full" data-act="send" data-ch="simulation">Marquer comme envoyé (simulation)</button></div>'+
+    '<p class="hint" style="margin-top:10px">Envoi en un tap : WhatsApp, SMS ou email s’ouvre avec le message prêt. Avec les relances automatiques, D4U le fait pour toi'+(realSend()?'.':' (en simulation pour l’instant).')+'</p>';
+  } else {
+    var why=el.reason==='exclu'?(el.why==='optout'?'Ce client est désabonné : il ne recevra plus de relance.':el.why==='contact'?'Aucun téléphone ni email exploitable : impossible de le relancer.':'Aucune date de visite : données insuffisantes.'):
+      el.reason==='actif'?'Client actif : aucune relance nécessaire.':el.reason==='booked'?'Ce client a déjà un rendez-vous prévu.':
+      el.reason==='wait'?'Prochaine relance (n°'+el.stage+') dans '+el.inDays+' jour'+(el.inDays>1?'s':'')+'.':el.reason==='replied'?'Ce client a répondu : la séquence est en pause.':
+      el.reason==='done'?'Les 3 relances ont été envoyées.':el.reason==='off'?'L’automation correspondante est désactivée.':'';
+    body='<div class="note">'+why+'</div>';
+  }
+  var res='';
+  if(c.recovered&&e.status==='actif')res='<div class="note" style="margin-top:16px;color:var(--diamond)"><span class="glyph">◇</span>&nbsp; Rendez-vous récupéré.</div>';
+  else if(c.relanced&&!c.optout)res='<p class="lbl" style="margin-top:20px">Résultat</p><div class="acts"><button class="btn'+(c.replied?' btn-primary':'')+'" data-act="replied">'+(c.replied?'A répondu ✓':'A répondu')+'</button><button class="btn btn-primary" data-act="recovered">A repris rendez-vous</button></div>';
+  var hist=S.messages.filter(function(m){return m.clientId===c.id&&m.status==='envoye';}).sort(function(a,b){return b.sentAt-a.sentAt;}).map(function(m){return '<div class="hist-r"><span>Relance '+m.stage+' · '+msgLabel(m)+'</span><span class="muted">'+ago(m.sentDay)+'</span></div>';}).join('');
+  var rhythm=c.lastVisit?'<div class="muted" style="font-size:13px;margin-top:6px">Rythme habituel : tous les '+e.fq+' jours ('+(e.autoFq?'calculé d’après son historique':'réglage')+')<br>'+
+    (e.late>0?'Retour prévu le '+fmtDate(e.due)+' · en retard de '+e.late+' jours':'Retour prévu le '+fmtDate(e.due)+' · dans '+(-e.late)+' jours')+'</div>':'';
+  var unsub=c.optout?(c.optoutSource==='manual'?'<div style="margin-top:20px"><button class="btn-link" data-act="resub">Réactiver les messages pour ce client</button></div>':''):
+    '<div style="margin-top:20px"><button class="btn-link" data-act="unsub">Ce client ne veut plus de messages (STOP)</button></div>';
+  return '<div class="sheet-h"><div><h2>'+esc(c.prenom)+' '+esc(c.nom)+'</h2><div style="display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap">'+pill(e.status)+'<span class="muted" style="font-size:13.5px">'+(c.lastVisit?e.days+' jours · vu le '+fmtDate(c.lastVisit):'Aucune visite connue')+'</span></div>'+rhythm+'<div class="muted" style="font-size:13px;margin-top:6px">'+esc([c.tel,c.email].filter(Boolean).join(' · '))+'</div></div><button class="x" data-act="close" aria-label="Fermer">×</button></div>'+
+    body+res+(hist?'<div style="margin-top:20px"><p class="lbl">Historique</p><div class="hist">'+hist+'</div></div>':'')+unsub;
+}
+function sQueue(){
+  var q=S.messages.filter(function(m){return m.status==='a_envoyer';});
+  var head='<div class="sheet-h"><div><h2>File d’envoi</h2><p class="muted" style="margin-top:6px;font-size:14px">'+(q.length?q.length+' message'+(q.length>1?'s':'')+' à envoyer':'Tout est traité.')+'</p></div><button class="x" data-act="close" aria-label="Fermer">×</button></div>';
+  if(!q.length)return head+'<button class="btn btn-primary btn-block" data-act="to-results">Voir les résultats</button>';
+  var rows=q.map(function(m){var c=clientById(m.clientId);if(!c)return '';
+    return '<div class="q-row"><div class="q-top"><b>'+esc(c.prenom)+' '+esc(c.nom)+'</b><span class="pill p-neutral">Relance '+m.stage+'</span></div><p>'+esc(m.text)+'</p><div class="q-btns"><button class="btn btn-sm" data-act="send-q" data-id="'+m.id+'" data-ch="whatsapp"'+(c.tel?'':' disabled')+'>WhatsApp</button><button class="btn btn-sm" data-act="send-q" data-id="'+m.id+'" data-ch="sms"'+(c.tel?'':' disabled')+'>SMS</button></div></div>';}).join('');
+  return head+'<div class="note" style="margin-bottom:8px">'+(realSend()?'Les relances automatiques partent toutes seules pendant les heures d’envoi. Tu peux aussi envoyer un message toi-même en un tap.':'Mode simulation : aucun envoi automatique réel. Simule l’envoi pour tester, ou envoie chaque message en un tap.')+'</div><div>'+rows+'</div>'+
+    '<div style="margin-top:16px"><button class="btn btn-primary btn-block" data-act="sim-all">Simuler l’envoi des '+q.length+' messages</button></div>';
+}
+
+/* ---------- rendu ---------- */
+function render(){
+  document.getElementById('root').innerHTML=ui.view==='landing'?vLanding():ui.view==='auth'?vAuth():ui.view==='onboarding'?vOnboard():vApp();
+  document.getElementById('sheet').innerHTML=ui.view==='app'?vSheet():'';
+}
+function go(view,tab){ui.view=view;if(tab)ui.tab=tab;ui.sheet=null;try{window.scrollTo(0,0);}catch(e){}render();}
+function kick(){ /* mode connecté : demande au serveur de traiter tout de suite (dans les heures d'envoi) */
+  if(!BACKEND||!sess)return;
+  pushNow().then(runNow).then(function(){return pollServer();}).then(function(n){if(n&&ui.view==='app'&&!ui.sheet&&!isTyping())render();});
+}
+function isTyping(){var a=document.activeElement;return !!(a&&(a.tagName==='TEXTAREA'||a.tagName==='INPUT'||a.tagName==='SELECT'));}
+
+/* ---------- actions ---------- */
+function readProfile(prefix,keys){keys.forEach(function(k){var el=document.getElementById(prefix+k);if(el)S.profile[k]=el.value.trim();});}
+function validateProfile(){
+  var p=S.profile,er={};
+  if(!p.nom)er.nom='Indique ton nom ou celui de ton salon.';
+  var l=p.lien;
+  if(!l)er.lien='Ajoute ton lien de réservation.';
+  else{if(!/^https?:\/\//i.test(l))l='https://'+l;if(/\s/.test(l)||l.indexOf('.')<0)er.lien='Ce lien ne semble pas valide.';else p.lien=l;}
+  var c=p.contact;
+  if(!c)er.contact='Ajoute un téléphone ou un email.';
+  else if(c.indexOf('@')>-1?!EMAIL_RE.test(c):digits(c).length<7)er.contact='Ce téléphone ou cet email ne semble pas valide.';
+  return er;
+}
+function handleRows(rows,name){
+  var r=startImport(rows,name);
+  if(!r.ok){ui.importErr=r.error;ui.imp=null;render();return;}
+  ui.imp=r.imp;ui.importErr=null;ui.step=2;try{window.scrollTo(0,0);}catch(e){}render();
+}
+function readFile(file){
+  ui.busy=true;ui.importErr=null;render();
+  readTable(file).then(function(rows){ui.busy=false;handleRows(rows,file.name);},function(err){ui.busy=false;ui.importErr=err&&err.title?err:{title:'Lecture impossible',msg:'Le fichier n’a pas pu être lu.'};render();});
+}
+function afterImport(){
+  if(S.auto.on){var n=runEngine();if(n)toast(n+' relance'+(n>1?'s':'')+' préparée'+(n>1?'s':'')+SIM()+'.');}
+  ui.step=(S.onboarded&&profileComplete())?4:3;ui.errors={};try{window.scrollTo(0,0);}catch(e){}render();
+}
+function doSend(ch,msgId,cid){
+  var m,c;
+  if(msgId){m=S.messages.filter(function(x){return x.id===msgId;})[0];c=m&&clientById(m.clientId);}
+  else{
+    c=clientById(cid);if(!c)return;var e=enrich(c),el=eligibility(e,false),pm=pending(c),text=(ui.draftMsg||'').trim();
+    if(!text){toast('Le message est vide.');return;}
+    if(pm){m=pm;m.text=text;}else{if(!el.ok)return;m=queueMsg(c,el.stage,text,{channel:ch==='simulation'?el.channel:ch,type:el.type});}
+  }
+  if(!m||!c)return;
+  if(ch==='simulation'){markSent(m,'simulation',true);toast('Envoi simulé. Rien n’est parti réellement.');}
+  else{markSent(m,ch,false);var ok=openExternal(linkFor(ch,c,m.text));if(ok)toast('Relance marquée comme envoyée.');else{copyText(m.text);toast('Message copié : colle-le dans '+CH_LABEL[ch]+'.');}}
+  ui.draftMsg='';render();
+}
+var saveT;function saveSoon(){clearTimeout(saveT);saveT=setTimeout(save,250);}
+function updPrev(i){var el=document.getElementById('prev'+i);if(el){var ex=exampleClient();el.textContent=renderTpl(S.templates[i],ex.c,ex.days);}}
+function setMaster(){
+  if(!S.auto.on){
+    if(!S.auto.consent){toast('Coche d’abord la confirmation d’accord des clients.');return;}
+    S.auto.on=true;var n=runEngine();save();render();kick();toast(n?n+' relance'+(n>1?'s':'')+' préparée'+(n>1?'s':'')+SIM()+'.':'Relances automatiques activées'+SIM()+'.');
+  } else {S.auto.on=false;save();render();toast('Relances automatiques désactivées.');}
+}
+
+document.addEventListener('click',function(ev){
+  var t=ev.target;
+  if(t.classList&&t.classList.contains('overlay')){ui.sheet=null;render();return;}
+  var a=t.closest&&t.closest('[data-act]');if(!a)return;
+  var act=a.getAttribute('data-act'),id=a.getAttribute('data-id'),v=a.getAttribute('data-v'),ch=a.getAttribute('data-ch');
+  if(a.disabled)return;
+  switch(act){
+    case 'home':go('landing');break;
+    case 'open-app':case 'start':if(BACKEND&&!sess){ui.authMsg='';go('auth');break;}enter();break;
+    case 'auth-in':case 'auth-up':
+      var em=((document.getElementById('a-email')||{}).value||'').trim(),pw=(document.getElementById('a-pass')||{}).value||'';
+      if(!em||!pw){ui.authEmail=em;ui.authMsg='Entre ton email et ton mot de passe.';render();break;}
+      if(act==='auth-up'&&pw.length<8){ui.authEmail=em;ui.authMsg='Mot de passe trop court (8 caractères minimum).';render();break;}
+      ui.authBusy=true;ui.authMsg='';ui.authEmail=em;render();
+      authCall(act==='auth-up'?'signup':'signin',em,pw).then(function(j){
+        if(!j.access_token){ui.authBusy=false;ui.authMsg='Compte créé. Vérifie ta boîte mail pour confirmer, puis connecte-toi.';render();return null;}
+        storeSess(sessFrom(j));return bootRemote().then(function(){ui.authBusy=false;fetchStatus();enter();});
+      }).catch(function(e){ui.authBusy=false;ui.authMsg=e&&e.message||'Connexion impossible.';render();});
+      break;
+    case 'signout':pushNow().then(function(){signOut();ui.filter='recover';go('landing');});break;
+    case 'freq':if(ui.view==='onboarding')readProfile('f-',['nom','lien','contact']);S.profile.freq=+v;save();if(ui.view==='app')toast('Fréquence mise à jour.');render();break;
+    case 'tog':
+      if(v==='adapt'){if(ui.view==='onboarding')readProfile('f-',['nom','lien','contact']);S.profile.adapt=!S.profile.adapt;}
+      else S.auto[v]=!S.auto[v];
+      save();render();break;
+    case 'master':setMaster();break;
+    case 'goto-auto':go('app','auto');break;
+    case 'paste-import':var pv=document.getElementById('f-paste');if(!pv||!pv.value.trim()){ui.importErr={title:'Rien à analyser',msg:'Colle d’abord ton tableau, ou choisis un fichier.'};render();}else handleRows(parseCSV(pv.value),'Tableau collé');break;
+    case 'newfile':ui.imp=null;ui.step=1;ui.importErr=null;render();break;
+    case 'cancel-import':ui.fromSettings=false;ui.imp=null;go('app','settings');break;
+    case 'analyze':
+      if(!ui.imp||requiredMissing(ui.imp.map).length){toast('Il manque une colonne.');break;}
+      var built=buildClients(ui.imp);
+      if(!built.clients.length){ui.importErr={title:'Aucun client valide',msg:'Aucune ligne n’a pu être importée. Vérifie que la colonne du prénom est bien choisie.'};ui.step=1;ui.imp=null;render();break;}
+      var res=mergeClients(built);res.file=ui.imp.name;ui.impRes=res;ui.imp=null;ui.fromSettings=false;afterImport();break;
+    case 'sample':S.clients=sampleClients();S.messages=[];S.sample=true;save();ui.importErr=null;ui.imp=null;ui.impRes={sample:true,added:S.clients.length,updated:0,rebooked:0,dupes:0,ignored:0};ui.fromSettings=false;afterImport();break;
+    case 'to-result':readProfile('f-',['nom','lien','contact']);ui.errors=validateProfile();
+      if(Object.keys(ui.errors).length){save();render();var ff=document.getElementById(ui.errors.nom?'f-nom':ui.errors.lien?'f-lien':'f-contact');if(ff)ff.focus();}
+      else{save();ui.step=4;try{window.scrollTo(0,0);}catch(e){}render();}break;
+    case 'activate':
+      var cb=document.getElementById('f-consent');
+      if(!cb||!cb.checked){toast('Coche d’abord la confirmation d’accord des clients.');break;}
+      S.auto.consent=true;S.auto.on=true;S.onboarded=true;var nn=runEngine();save();kick();ui.filter='recover';ui.shown=40;go('app','clients');
+      toast(nn?nn+' relance'+(nn>1?'s':'')+' préparée'+(nn>1?'s':'')+SIM()+'.':'Relances automatiques activées'+SIM()+'.');break;
+    case 'skip-activate':case 'see-app':S.onboarded=true;save();ui.filter='recover';ui.shown=40;go('app','clients');break;
+    case 'tab':ui.tab=v;ui.shown=40;go('app',v);break;
+    case 'filter':ui.filter=v;ui.shown=40;render();break;
+    case 'more':ui.shown+=40;render();break;
+    case 'open-client':
+      var c=clientById(id);if(!c)break;var e=enrich(c),el=eligibility(e,false),pm=pending(c);
+      ui.draftMsg=pm?pm.text:(el.ok?renderTpl(S.templates[el.stage-1],c,e.days):'');ui.sheet=id;render();break;
+    case 'close':ui.sheet=null;render();break;
+    case 'send':doSend(ch,null,ui.sheet);break;
+    case 'copy':toast(copyText(ui.draftMsg)?'Message copié.':'Copie impossible : sélectionne le texte.');break;
+    case 'replied':var rc=clientById(ui.sheet);if(rc){rc.replied=!rc.replied;save();render();}break;
+    case 'recovered':var cc=clientById(ui.sheet);if(cc){recover(cc,true);save();toast('◇  Rendez-vous récupéré.');render();}break;
+    case 'unsub':var uc=clientById(ui.sheet);if(uc){unsubscribe(uc,'manual');toast('Client désabonné : plus aucune relance.');render();}break;
+    case 'resub':var sc=clientById(ui.sheet);if(sc&&sc.optoutSource==='manual'){sc.optout=false;save();toast('Messages réactivés.');render();}break;
+    case 'bulk':var n=bulkRelance();if(n){ui.sheet='queue';render();}else toast('Aucun client éligible.');break;
+    case 'open-queue':ui.sheet='queue';render();break;
+    case 'send-q':doSend(ch,id,null);break;
+    case 'sim-all':var q=S.messages.filter(function(m){return m.status==='a_envoyer';});q.forEach(function(m){markSent(m,'simulation',true);});toast(q.length+' messages simulés. Rien n’est parti réellement.');render();break;
+    case 'to-results':ui.sheet=null;go('app','results');break;
+    case 'ins':var ta=document.getElementById('tpl'+a.getAttribute('data-i'));if(ta){var s=ta.selectionStart==null?ta.value.length:ta.selectionStart;ta.value=ta.value.slice(0,s)+v+ta.value.slice(ta.selectionEnd==null?s:ta.selectionEnd);ta.focus();var pos=s+v.length;ta.setSelectionRange(pos,pos);var ii=+a.getAttribute('data-i');S.templates[ii]=ta.value;save();updPrev(ii);}break;
+    case 'tpl-reset':var ri=+a.getAttribute('data-i');S.templates[ri]=DEFAULT_TPL[ri];save();render();toast('Message par défaut rétabli.');break;
+    case 'reimport':ui.fromSettings=true;ui.step=1;ui.errors={};ui.imp=null;ui.importErr=null;go('onboarding');break;
+    case 'reset':if(!ui.confirmReset){ui.confirmReset=true;render();setTimeout(function(){ui.confirmReset=false;if(ui.view==='app'&&ui.tab==='settings')render();},4000);}else{S=blank();save();ui.confirmReset=false;ui.filter='recover';go('landing');}break;
+  }
+});
+document.addEventListener('input',function(ev){
+  var t=ev.target,b=t.getAttribute&&t.getAttribute('data-bind');if(!b)return;
+  if(b==='draft')ui.draftMsg=t.value;
+  else if(b.indexOf('tpl')===0){var i=+b.slice(3);S.templates[i]=t.value;saveSoon();updPrev(i);}
+  else if(b.indexOf('delay')===0){var n=Math.max(b==='delay1'?0:1,Math.min(60,parseInt(t.value,10)||(b==='delay1'?0:1)));S.delays['r'+b.slice(5)]=n;saveSoon();}
+});
+document.addEventListener('change',function(ev){
+  var t=ev.target,b=t.getAttribute&&t.getAttribute('data-bind');
+  if(t.id==='f-file'&&t.files&&t.files[0]){readFile(t.files[0]);return;}
+  if(b==='map'&&ui.imp){
+    var col=+t.getAttribute('data-col'),val=t.value,map=ui.imp.map;
+    Object.keys(map).forEach(function(k){if(map[k]===col)delete map[k];});
+    if(val){map[val]=col;ui.imp.src[val]='user';}
+    render();return;
+  }
+  if(b==='consent'){S.auto.consent=t.checked;if(!t.checked)S.auto.on=false;save();render();return;}
+  if(b==='set'){
+    var old=Object.assign({},S.profile);readProfile('s-',['nom','lien','contact']);
+    var pr=document.getElementById('s-prix');if(pr)S.profile.prix=Math.max(0,+pr.value||0);
+    var er=validateProfile(),le=document.getElementById('s-lien-err');
+    if(er.nom||er.lien||er.contact){S.profile=old;if(le)le.textContent=er.lien||er.nom||er.contact;toast('Vérifie les champs.');return;}
+    if(le)le.textContent='';save();toast('Enregistré.');
+  }
+});
+document.addEventListener('toggle',function(ev){if(ev.target&&ev.target.id==='others')ui.othersOpen=ev.target.open;},true);
+document.addEventListener('dragover',function(ev){var d=ev.target.closest&&ev.target.closest('.drop');if(d){ev.preventDefault();d.classList.add('over');}});
+document.addEventListener('dragleave',function(ev){var d=ev.target.closest&&ev.target.closest('.drop');if(d)d.classList.remove('over');});
+document.addEventListener('drop',function(ev){var d=ev.target.closest&&ev.target.closest('.drop');if(d){ev.preventDefault();d.classList.remove('over');var f=ev.dataTransfer&&ev.dataTransfer.files&&ev.dataTransfer.files[0];if(f)readFile(f);}});
+document.addEventListener('keydown',function(ev){if(ev.key==='Escape'&&ui.sheet){ui.sheet=null;render();}
+  if(ev.key==='Enter'&&ev.target&&(ev.target.id==='a-pass'||ev.target.id==='a-email')){var b=document.querySelector('[data-act=auth-in]');if(b&&!b.disabled)b.click();}});
+window.addEventListener('pagehide',save);window.addEventListener('beforeunload',save);
+
+/* moteur : tourne à l'ouverture puis toutes les minutes tant que l'app est ouverte */
+function tick(){
+  if(BACKEND&&sess){if(sync.state==='error')pushNow();pollServer().then(function(c){if(c&&ui.view==='app'&&!ui.sheet&&!isTyping())render();});}
+  if(!S.auto.on)return;
+  var n=runEngine();
+  if(n&&ui.view==='app'&&!ui.sheet&&!isTyping()){render();toast(n+' relance'+(n>1?'s':'')+' préparée'+(n>1?'s':'')+SIM()+'.');}
+}
+setInterval(tick,60000);
+document.addEventListener('visibilitychange',function(){if(!document.hidden)tick();});
+
+window.RC={parseCSV:parseCSV,startImport:startImport,buildClients:buildClients,mergeClients:mergeClients,requiredMissing:requiredMissing,statusOf:statusOf,renderTpl:renderTpl,parseDate:parseDate,
+  state:function(){return S;},counts:counts,stats:stats,ui:ui,enrich:enrich,eligibility:eligibility,runEngine:runEngine,setToday:setToday,avgInterval:avgInterval,save:save,PROVIDERS:PROVIDERS};
+if(S.auto.on)runEngine();
+render();
+if(BACKEND){
+  fetchStatus().then(function(){if(ui.view==='app')render();});
+  if(sess)bootRemote().then(function(){if(ui.view==='landing'&&S.onboarded)go('app','clients');else render();},
+    function(e){sync.state='error';if(e&&(e.status===401||e.status===403||/expir/i.test(e.message||''))){storeSess(null);S=blank();REMOTE=false;}render();});
+}
+})();
+</script>
+
+</body></html>
